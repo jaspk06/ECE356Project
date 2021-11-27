@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+    mysqldb:
+        image: mysql
+        container_name: db
+        restart: unless-stopped
+        env_file: ./.env
+        environment:
+            - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+            - MYSQL_DATABASE=$MYSQLDB_DATABASE
+        ports:
+            - "3307:3306"
+        expose:
+          - "3306"
+        volumes:
+            - db:/var/lib/mysql
+
+    client-app:
+        build:
+            context: ./client-app
+            dockerfile: Dockerfile
+        depends_on:
+            - mysqldb
+        image: client-app
+        restart: unless-stopped
+        env_file: ./.env
+        container_name: client-app
+        environment:
+            - DB_HOST=mysqldb
+            - DB_USER=$MYSQLDB_USER
+            - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+            - DB_NAME=$MYSQLDB_DATABASE
+            - DB_PORT=$MYSQLDB_DOCKER_PORT
+        ports:
+            - "9229:9229"
+            - "8080:8080"
+        volumes:
+            - ./client-app/build:/home/node/app/build
+            - ./client-app/src:/home/node/app/src
+            - ./client-app/nodemon.json:/home/node/app/nodemon.json
+        command: dev
+
+volumes:
+    db: 
