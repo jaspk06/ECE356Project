@@ -11,8 +11,6 @@ services:
             - MYSQL_DATABASE=$MYSQLDB_DATABASE
         ports:
             - "3307:3306"
-        expose:
-          - "3306"
         volumes:
             - db:/var/lib/mysql
 
@@ -27,11 +25,11 @@ services:
         env_file: ./.env
         container_name: client-app
         environment:
-            - DB_HOST=mysqldb
+            - DB_HOST=$MYSQLDB_HOST
             - DB_USER=$MYSQLDB_USER
             - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
             - DB_NAME=$MYSQLDB_DATABASE
-            - DB_PORT=$MYSQLDB_DOCKER_PORT
+            - DB_PORT=$MYSQLDB_LOCAL_PORT
         ports:
             - "9229:9229"
             - "8080:8080"
