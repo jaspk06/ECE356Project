@@ -29,6 +29,7 @@ This is what your directory tree should look like:
 │   ├── ...
 ```
 
+[Click here](https://dbdiagram.io/d/61a168448c901501c0d4b260) to view the diagram of the schema
 
 # Features
 
