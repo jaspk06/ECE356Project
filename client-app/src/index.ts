@@ -1,7 +1,11 @@
 import mysql from 'mysql2';
 import * as dotenv from "dotenv";
+import readline from 'readline';
+import { exit } from 'process';
 
 dotenv.config();
+
+console.log("Connecting to MySQL Engine");
 
 // create the connection to database
 const connection = mysql.createConnection({
@@ -12,21 +16,21 @@ const connection = mysql.createConnection({
   port: parseInt(process.env.DB_PORT || "3306")
 });
 
+console.log("Connection Success!");
 
-// // simple query
-// connection.query(
-//   'SELECT * FROM `table` WHERE `name` = "Page" AND `age` > 45',
-//   function (err, results, fields) {
-//     console.log(results); // results contains rows returned by server
-//     console.log(fields); // fields contains extra meta data about results, if available
-//   }
-// );
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-// // with placeholder
-// connection.query(
-//   'SELECT * FROM `table` WHERE `name` = ? AND `age` > ?',
-//   ['Page', 45],
-//   function (err, results) {
-//     console.log(results);
-//   }
-// );
+const waitForUserInput = () =>
+  rl.question("Command: ", (answer) => {
+    if (answer == "exit") {
+      console.log("Goodbye");
+      rl.close();
+      exit();
+    } else {
+      waitForUserInput();
+    }
+  });
+
+waitForUserInput();
+
+export default connection;
