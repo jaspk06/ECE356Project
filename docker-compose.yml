@@ -40,5 +40,24 @@ services:
         stdin_open: true
         tty: true
 
+    client-app-ui:
+        build:
+            context: ./client-app-ui
+            dockerfile: Dockerfile
+        depends_on:
+            - client-app
+        image: client-app-ui
+        restart: unless-stopped
+        container_name: client-app-ui
+        environment:
+            - CHOKIDAR_USEPOLLING=true
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./client-app-ui/build:/home/node/app/build
+            - ./client-app-ui/src:/home/node/app/src
+        stdin_open: true
+        tty: true
+
 volumes:
     db: 
