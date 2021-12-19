@@ -19,11 +19,12 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME,
     port: parseInt(process.env.DB_PORT || "3306")
 });
+db.connect();
 console.log("Connection Success!");
 
 // Application routing
 routes(app);
 
-export { db };
-export default app;
+export { db, app };
+// export default ;
 
