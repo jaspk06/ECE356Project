@@ -7,8 +7,6 @@ WORKDIR /usr/src/app
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
 
-WORKDIR /home/node/app
-
 COPY package*.json ./
 
 RUN yarn install
