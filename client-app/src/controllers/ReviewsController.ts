@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import { db } from 'app';
+import { db } from '../app';
 
 const ReviewsController: Router = Router();
 
