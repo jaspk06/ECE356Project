@@ -16,7 +16,7 @@ To run the code locally, follow the steps below
 5. Within the container, you can now run `yarn dev-load` to run the csv data insertion script or `yarn dev` to run the Express server on `localhost:8080`.
 
 If you are missing the CSV data files
-1. Download [recipe.csv](https://www.kaggle.com/kanaryayi/recipe-ingredients-and-reviews?select=recipes.csv) and [review.csv](https://www.kaggle.com/kanaryayi/recipe-ingredients-and-reviews?select=reviews.csv) from the dataset
+1. Download [PP_recipes.csv](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions?select=PP_recipes.csv), [PP_users.csv](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions?select=PP_users.csv), [RAW_interactions.csv](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions?select=RAW_interactions.csv), [RAW_recipes.csv](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions?select=RAW_recipes.csv), and parsed [ingr_map.pkl](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions?select=ingr_map.pkl) from the dataset
 2. Move it to the directory `ECE356Project/client-app/data/*.csv`
 
 This is what your directory tree should look like:
