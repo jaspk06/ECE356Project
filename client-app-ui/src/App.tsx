@@ -2,7 +2,9 @@ import { Navigate } from "react-router-dom";
 import { Route, Routes } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import RecipeCard from "./components/RecipeCard";
+import RecipeForm from "./components/RecipeForm";
 import Recipes from "./components/Recipes";
+import UserForm from "./components/UserForm";
 import UserProfile from "./components/UserProfile";
 
 export default function App() {
@@ -11,6 +13,8 @@ export default function App() {
       <Navigation>
         <Routes>
           <Route path="/recipes/:recipeId" element={<RecipeCard />} />
+          <Route path="/create/recipe" element={<RecipeForm />} />
+          <Route path="/create/user" element={<UserForm />} />
           <Route path="/users/:userId" element={<UserProfile />} />
           <Route path="/" element={<Recipes />} />
           <Route path="*" element={<Navigate replace to="/" />} />

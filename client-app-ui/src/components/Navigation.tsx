@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { BellIcon, MenuIcon, XIcon, SearchIcon, UserIcon, PlusIcon, CubeIcon } from '@heroicons/react/outline'
 import { Link } from 'react-router-dom'
@@ -11,13 +11,16 @@ const user = {
 }
 const userNavigation = [
     { name: 'Your Profile', href: 'users/20' },
-    { name: 'Sign out', href: '/' },
 ]
 
 function classNames(...classes: Array<string>) {
     return classes.filter(Boolean).join(' ')
 }
 export default function Navigation(props: any) {
+    const id = localStorage.getItem("userId");
+    const [userId, setUserId] = useState<string>(id ? id : "");
+    const [signedIn, setsignedIn] = useState(!!id);
+
     return (
         <div className="min-h-full">
             <Disclosure as="nav" className="bg-gray-800">
@@ -37,42 +40,68 @@ export default function Navigation(props: any) {
                                             </button>
                                         </Link>
                                     </div>
-                                    <div className="hidden md:block">
-                                        <div className="ml-10 flex items-baseline space-x-4">
-                                            <div className="flex rounded-md shadow-sm ">
-                                                <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                                                    <SearchIcon className="h-4 w-4" aria-hidden="true" />
-                                                </span>
-                                                <input
-                                                    type="text"
-                                                    name="search-box"
-                                                    id="search-box"
-                                                    className="focus:ring-indigo-500 focus:border-indigo-500 flex-1  block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
-                                                    placeholder="Search for recipe"
-                                                />
-                                            </div>
-
+                                    <div className="ml-10 flex items-baseline space-x-4">
+                                        <div className="flex rounded-md shadow-sm ">
+                                            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                                                <SearchIcon className="h-4 w-4" aria-hidden="true" />
+                                            </span>
+                                            <input
+                                                type="text"
+                                                name="search-box"
+                                                id="search-box"
+                                                className="focus:ring-indigo-500 focus:border-indigo-500 flex-1  block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
+                                                placeholder="Search for recipe"
+                                            />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="hidden md:block">
+                                {!signedIn &&
+                                    <>
+
+                                        <div className="flex">
+
+                                            <input
+                                                type="text"
+                                                name="recipe-title"
+                                                id="recipe-title"
+                                                value={userId}
+                                                onChange={e => setUserId(e.target.value)}
+                                                placeholder='User ID'
+                                                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-l-md"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => { localStorage.setItem("userId", userId); setsignedIn(true) }}
+                                                className="px-4 border border-gray-300 shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500"
+                                            >Login
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="px-4 border border-gray-300 rounded-r-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500"
+                                            > <Link to='/create/user'>Sign Up
+                                                </Link></button>
+
+                                        </div>
+                                    </>}
+                                {signedIn && <div className="hidden md:block">
                                     <div className="ml-4 flex items-center md:ml-6">
-                                        <button
-                                            type="button"
-                                            className="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-                                        >
-                                            <span className="sr-only">Add Recipe</span>
-                                            <PlusIcon className="h-6 w-6" aria-hidden="true" />
-                                        </button>
+                                        <Link to='/create/recipe'>
+                                            <button
+                                                type="button"
+                                                className="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                                            >
+                                                <span className="sr-only">Add Recipe</span>
+                                                <PlusIcon className="h-6 w-6" aria-hidden="true" />
+                                            </button>
+                                        </Link>
 
                                         {/* Profile dropdown */}
                                         <Menu as="div" className="ml-3 relative">
-                                            <div>
-                                                <Menu.Button className="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
-                                                    <span className="sr-only">Open user menu</span>
-                                                    <UserIcon className="h-6 w-6" aria-hidden="true" />
-                                                </Menu.Button>
-                                            </div>
+                                            <Menu.Button className="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+                                                <span className="sr-only">Open user menu</span>
+                                                <UserIcon className="h-6 w-6" aria-hidden="true" />
+                                            </Menu.Button>
+
                                             <Transition
                                                 as={Fragment}
                                                 enter="transition ease-out duration-100"
@@ -99,71 +128,27 @@ export default function Navigation(props: any) {
                                                             </Menu.Item>
                                                         </Link>
                                                     ))}
+                                                    <Link to={"/"}>
+                                                        <Menu.Item key={"sign-out"} onClick={() => { localStorage.removeItem("userId"); setsignedIn(false); }}>
+                                                            {({ active }) => (
+                                                                <p
+                                                                    className={classNames(
+                                                                        active ? 'bg-gray-100' : '',
+                                                                        'block px-4 py-2 text-sm text-gray-700'
+                                                                    )}
+                                                                >
+                                                                    Sign out
+                                                                </p>
+                                                            )}
+                                                        </Menu.Item>
+                                                    </Link>
                                                 </Menu.Items>
                                             </Transition>
                                         </Menu>
                                     </div>
-                                </div>
-                                <div className="-mr-2 flex md:hidden">
-                                    {/* Mobile menu button */}
-                                    <Disclosure.Button className="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
-                                        <span className="sr-only">Open main menu</span>
-                                        {open ? (
-                                            <XIcon className="block h-6 w-6" aria-hidden="true" />
-                                        ) : (
-                                            <MenuIcon className="block h-6 w-6" aria-hidden="true" />
-                                        )}
-                                    </Disclosure.Button>
-                                </div>
+                                </div>}
                             </div>
                         </div>
-
-                        <Disclosure.Panel className="md:hidden">
-                            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                                <div className="flex rounded-md shadow-sm ">
-                                    <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                                        <SearchIcon className="h-4 w-4" aria-hidden="true" />
-                                    </span>
-                                    <input
-                                        type="text"
-                                        name="search-box"
-                                        id="search-box"
-                                        className="focus:ring-indigo-500 focus:border-indigo-500 flex-1  block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
-                                        placeholder="Search for recipe"
-                                    />
-                                </div>
-                            </div>
-                            <div className="pt-4 pb-3 border-t border-gray-700">
-                                <div className="flex items-center px-5">
-                                    <div className="flex-shrink-0">
-                                        <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
-                                    </div>
-                                    <div className="ml-3">
-                                        <div className="text-base font-medium leading-none text-white">{user.name}</div>
-                                        <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        className="ml-auto bg-gray-800 flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-                                    >
-                                        <span className="sr-only">View notifications</span>
-                                        <BellIcon className="h-6 w-6" aria-hidden="true" />
-                                    </button>
-                                </div>
-                                <div className="mt-3 px-2 space-y-1">
-                                    {userNavigation.map((item) => (
-                                        <Disclosure.Button
-                                            key={item.name}
-                                            as="a"
-                                            href={item.href}
-                                            className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
-                                        >
-                                            {item.name}
-                                        </Disclosure.Button>
-                                    ))}
-                                </div>
-                            </div>
-                        </Disclosure.Panel>
                     </>
                 )}
             </Disclosure>
