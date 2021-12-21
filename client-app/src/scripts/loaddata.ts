@@ -1,17 +1,13 @@
-import mysql from 'mysql2';
 import { parse } from 'csv-parse';
 import fs from 'fs';
-import * as dotenv from "dotenv";
 import { Recipe } from 'types/recipes';
-import ObjectsToCsv from 'objects-to-csv';
+import { Parser } from 'json2csv';
 import { RecipeIngredients } from 'types/recipeIngredients';
 import { Ingredient, IngredientAlias } from 'types/ingredients';
-import { exit } from 'process';
 import { User } from 'types/user';
 import faker, { date, fake } from 'faker';
 import { Tag } from 'types/tags';
 
-dotenv.config();
 
 interface RecipeCSV {
     'Recipe Name': string,
@@ -76,11 +72,14 @@ interface FullIngredientsCSV {
     id: number
 }
 
+const json2csvParser = new Parser();
+
 (() => {
     console.log("loading ingredients...")
     const ingredients: Array<Ingredient> = [];
     const ingredientAliases: Array<IngredientAlias> = [];
     let count = 0;
+    const startTime = performance.now();
     fs.createReadStream('data/FullIngredients.csv')
         .pipe(parse({
             skipEmptyLines: true,
@@ -101,19 +100,25 @@ interface FullIngredientsCSV {
             }
         })
         .on('end', async () => {
+            console.log("Parsing objects...")
             ingredients.sort((a, b) => a.ingredientId - b.ingredientId);
-            const csvIngredients = new ObjectsToCsv(ingredients);
-            await csvIngredients.toDisk('data/PARSED_ingredients.csv');
-            const csvAlias = new ObjectsToCsv(ingredientAliases);
-            await csvAlias.toDisk('data/PARSED_alias.csv');
-            console.log("ingredients written to data/PARSED_ingredients.csv");
-            console.log("ingredients written to data/PARSED_alias.csv");
+            const csvIngredients = json2csvParser.parse(ingredients);
+            const csvAlias = json2csvParser.parse(ingredientAliases);
+
+            console.log("Parsed objects. Writing to csv files...")
+            fs.writeFileSync('data/PARSED_ingredients.csv', csvIngredients);
+            fs.writeFileSync('data/PARSED_alias.csv', csvAlias);
+            const perf = new Date(performance.now() - startTime);
+
+            console.log("written to data/PARSED_ingredients.csv, data/PARSED_alias.csv");
+            console.log(`took ${perf.getMinutes()}:${perf.getSeconds()}\n\n`);
         })
 })();
 
 (() => {
     console.log("loading users...")
     const users: Array<User> = [];
+    const startTime = performance.now();
     fs.createReadStream('data/PP_users.csv')
         .pipe(parse({
             skipEmptyLines: true,
@@ -127,10 +132,15 @@ interface FullIngredientsCSV {
             users.push({ userId: row.u, firstName: faker.name.firstName(), lastName: faker.name.lastName(), email: faker.internet.email(), phoneNumber: faker.phone.phoneNumber(), gender: faker.name.gender(), birthday: faker.date.between(1950, new Date().getFullYear() - 12), dateJoined: faker.date.between(2000, new Date()), passwordHash: "123456" })
         })
         .on('end', async () => {
-            // ingredients.sort((a, b) => a.ingredientId - b.ingredientId);
-            const csvIngredients = new ObjectsToCsv(users);
-            await csvIngredients.toDisk('data/PARSED_users.csv');
+            console.log("Parsing objects...")
+            const csvUsers = json2csvParser.parse(users);
+
+            console.log("Parsed objects. Writing to csv files...")
+            fs.writeFileSync('data/PARSED_users.csv', csvUsers);
+            const perf = new Date(performance.now() - startTime);
+
             console.log("written to data/PARSED_users.csv");
+            console.log(`took ${perf.getMinutes()}:${perf.getSeconds()}\n\n`);
         })
 })();
 
@@ -140,6 +150,7 @@ const recipeTags: Array<{ recipeId: number, tagId: number }> = [];
 (() => {
     console.log("loading recipes...")
     let count = 0;
+    const startTime = performance.now();
     fs.createReadStream('data/RAW_recipes.csv')
         .pipe(parse({
             skipEmptyLines: true,
@@ -166,13 +177,19 @@ const recipeTags: Array<{ recipeId: number, tagId: number }> = [];
         })
         .on('end', async () => {
             // ingredients.sort((a, b) => a.ingredientId - b.ingredientId);
-            const csvRecipes = new ObjectsToCsv(recipes);
-            const csvRecipeTags = new ObjectsToCsv(recipeTags);
-            const csvTags = new ObjectsToCsv(tags);
-            await csvRecipes.toDisk('data/PARSE_recipes.csv');
-            await csvRecipeTags.toDisk('data/PARSE_recipe_tags.csv');
-            await csvTags.toDisk('data/PARSE_tags.csv');
+            console.log("Parsing objects...")
+            const csvRecipes = json2csvParser.parse(recipes);
+            const csvRecipeTags = json2csvParser.parse(recipeTags);
+            const csvTags = json2csvParser.parse(tags);
+
+            console.log("Parsed objects. Writing to csv files...")
+            fs.writeFileSync('data/PARSE_recipes.csv', csvRecipes);
+            fs.writeFileSync('data/PARSE_recipe_tags.csv', csvRecipeTags);
+            fs.writeFileSync('data/PARSE_tags.csv', csvTags);
+            const perf = new Date(performance.now() - startTime);
+
             console.log("written to data/RAW_recipes.csv, data/PARSE_tags.csv, data/PARSE_recipe_tags.csv");
+            console.log(`took ${perf.getMinutes()}:${perf.getSeconds()} \n\n`);
         })
 })();
 
