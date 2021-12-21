@@ -1,8 +1,9 @@
 import { Recipe } from "./recipes";
 
-export interface Review{
-    reviewID: number,
-    recipe: Recipe,
+export interface Review {
+    recipeId: number,
+    userId: number,
     rating: number,
+    date: Date,
     review: string
 }

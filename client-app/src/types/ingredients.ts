@@ -5,5 +5,5 @@ export interface Ingredient {
 }
 export interface IngredientAlias {
     aliasId: number,
-    aliasName: string
+    alias: string
 }
