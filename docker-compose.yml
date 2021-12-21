@@ -34,9 +34,10 @@ services:
             - "9229:9229"
             - "8080:8080"
         volumes:
-            - ./client-app/build:/home/node/app/build
-            - ./client-app/src:/home/node/app/src
-            - ./client-app/nodemon.json:/home/node/app/nodemon.json
+            - ./client-app/build:/usr/src/app/build
+            - ./client-app/data:/usr/src/app/data
+            - ./client-app/src:/usr/src/app/src
+            - ./client-app/nodemon.json:/usr/src/app/nodemon.json
         stdin_open: true
         tty: true
 
@@ -54,8 +55,8 @@ services:
         ports:
             - "3000:3000"
         volumes:
-            - ./client-app-ui/build:/home/node/app/build
-            - ./client-app-ui/src:/home/node/app/src
+            - ./client-app-ui/build:/usr/src/app/build
+            - ./client-app-ui/src:/usr/src/app/src
         stdin_open: true
         tty: true
 
