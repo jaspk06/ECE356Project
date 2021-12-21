@@ -8,15 +8,14 @@ UserController.get('/:userId', async (req: Request, res: Response, next: NextFun
         const { userId } = req.params;
 
         // user details
-        var { userID, firstname, lastname } = req.body;
+        let { userID, firstname, lastname } = req.body;
 
         userID = parseInt(userID);
 
         console.log(req.body);
 
-        var userQuery = `SELECT * FROM Users`;
+        let userQuery = `SELECT * FROM Users`;
         userQuery += ` WHERE userID LIKE '%' `
-        var values = [ userID, firstname, lastname];
 
         userID = parseInt(userID);
 
@@ -30,7 +29,7 @@ UserController.get('/:userId', async (req: Request, res: Response, next: NextFun
             userQuery+= ` AND lastname = '`+ lastname + `' `;
         }
 
-        var returnRes;
+        let returnRes;
         db.query( userQuery, function (err, rows, fields) {
             if (err) {
                 console.log(err)

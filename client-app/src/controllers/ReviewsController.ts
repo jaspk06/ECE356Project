@@ -7,13 +7,13 @@ ReviewsController.get('/:recipeId', async (req: Request, res: Response, next: Ne
     try {
         const { recipeId } = req.params;
 
-        var { reviewID, recipeID, userID, rating } = req.body;
+        let { reviewID, recipeID, userID, rating } = req.body;
 
         reviewID = parseInt(reviewID);
         recipeID = parseInt(recipeID);
         userID = parseInt(userID);
 
-        var userQuery = `SELECT review FROM Reviews`;
+        let userQuery = `SELECT review FROM Reviews`;
         userQuery += ` WHERE userID LIKE '%' `
 
         if(!(userID === undefined) && !(isNaN(userID)) ){
@@ -29,7 +29,7 @@ ReviewsController.get('/:recipeId', async (req: Request, res: Response, next: Ne
             userQuery+= ` AND rating > `+ rating + ` `;
         }
 
-        var returnRes;
+        let returnRes;
         db.query( userQuery, function (err, rows, fields) {
             if (err) {
                 console.log(err)
