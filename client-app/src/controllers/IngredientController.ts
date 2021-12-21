@@ -19,28 +19,23 @@ IngredientController.get('/:userId', async (req: Request, res: Response, next: N
 
         var ingredientQuery = `SELECT * FROM Ingredients`;
         ingredientQuery += ` WHERE ingredientName LIKE '%' `
-        var values = [ingredientName, aliasID];
+        // var values = [];
 
         if(!(ingredientID === undefined)){
             ingredientQuery+= ` AND ingredientID = `+ ingredientID + " ";
         }
         if(!(ingredientName === undefined)){
-            ingredientQuery+= ` AND ingredientName = '`+ ingredientName + "' ";
+            ingredientQuery+= ` AND ingredientName = "`+ ingredientName + `" `;
         }
-        if(!(aliasID === undefined)){
+        if(!(aliasID === undefined) && !(isNaN(aliasID))){
             ingredientQuery+= ` AND aliasID = `+ aliasID + " ";
         }
 
         var returnRes;
-        db.query( ingredientQuery, values, function (err, rows, fields) {
+        db.query( ingredientQuery, function (err, rows, fields) {
             if (err) {
                 console.log(err)
             } else {
-                
-                result = rows;
-                returnRes = {
-                    'nestedarray' : result
-                };
                 res.status(200).json(rows);
             }
         })
