@@ -1,20 +1,17 @@
 /* This example requires Tailwind CSS v2.0+ */
 import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { BellIcon, MenuIcon, XIcon, SearchIcon } from '@heroicons/react/outline'
+import { BellIcon, MenuIcon, XIcon, SearchIcon, UserIcon, PlusIcon, CubeIcon } from '@heroicons/react/outline'
+import { Link } from 'react-router-dom'
 
 const user = {
     name: 'User',
     email: 'example@example.com',
     imageUrl: ''
 }
-const navigation = [
-    { name: 'Recipes', href: '#', current: true },
-]
 const userNavigation = [
-    { name: 'Your Profile', href: '#' },
-    { name: 'Settings', href: '#' },
-    { name: 'Sign out', href: '#' },
+    { name: 'Your Profile', href: 'users/20' },
+    { name: 'Sign out', href: '/' },
 ]
 
 function classNames(...classes: Array<string>) {
@@ -30,11 +27,15 @@ export default function Navigation(props: any) {
                             <div className="flex items-center justify-between h-16">
                                 <div className="flex items-center">
                                     <div className="flex-shrink-0">
-                                        <img
-                                            className="h-8 w-8"
-                                            src={process.env.PUBLIC_URL + '/tabler-icon-cookie.svg'}
-                                            alt="Workflow"
-                                        />
+                                        <Link to="/">
+                                            <button
+                                                type="button"
+                                                className="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none"
+                                            >
+                                                <span className="sr-only">Home</span>
+                                                <CubeIcon className="h-10 w-10" aria-hidden="true" />
+                                            </button>
+                                        </Link>
                                     </div>
                                     <div className="hidden md:block">
                                         <div className="ml-10 flex items-baseline space-x-4">
@@ -60,16 +61,16 @@ export default function Navigation(props: any) {
                                             type="button"
                                             className="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
                                         >
-                                            <span className="sr-only">View notifications</span>
-                                            <BellIcon className="h-6 w-6" aria-hidden="true" />
+                                            <span className="sr-only">Add Recipe</span>
+                                            <PlusIcon className="h-6 w-6" aria-hidden="true" />
                                         </button>
 
                                         {/* Profile dropdown */}
                                         <Menu as="div" className="ml-3 relative">
                                             <div>
-                                                <Menu.Button className="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+                                                <Menu.Button className="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                                                     <span className="sr-only">Open user menu</span>
-                                                    <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
+                                                    <UserIcon className="h-6 w-6" aria-hidden="true" />
                                                 </Menu.Button>
                                             </div>
                                             <Transition
@@ -83,19 +84,20 @@ export default function Navigation(props: any) {
                                             >
                                                 <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                                                     {userNavigation.map((item) => (
-                                                        <Menu.Item key={item.name}>
-                                                            {({ active }) => (
-                                                                <a
-                                                                    href={item.href}
-                                                                    className={classNames(
-                                                                        active ? 'bg-gray-100' : '',
-                                                                        'block px-4 py-2 text-sm text-gray-700'
-                                                                    )}
-                                                                >
-                                                                    {item.name}
-                                                                </a>
-                                                            )}
-                                                        </Menu.Item>
+                                                        <Link to={item.href}>
+                                                            <Menu.Item key={item.name}>
+                                                                {({ active }) => (
+                                                                    <p
+                                                                        className={classNames(
+                                                                            active ? 'bg-gray-100' : '',
+                                                                            'block px-4 py-2 text-sm text-gray-700'
+                                                                        )}
+                                                                    >
+                                                                        {item.name}
+                                                                    </p>
+                                                                )}
+                                                            </Menu.Item>
+                                                        </Link>
                                                     ))}
                                                 </Menu.Items>
                                             </Transition>
@@ -165,16 +167,8 @@ export default function Navigation(props: any) {
                     </>
                 )}
             </Disclosure>
-
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Recipes</h1>
-                </div>
-            </header>
             <main>
-                <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                    {props.children}
-                </div>
+                {props.children}
             </main>
         </div>
     );

@@ -1,4 +1,5 @@
 import RecipeCard from "./RecipeCard"
+import RecipeCardMini from "./RecipeCardMini"
 
 const recipes = [
     {
@@ -39,20 +40,26 @@ const recipes = [
     }
 ]
 
-export default function Home() {
+export default function Recipes() {
     return (
         <>
-            <div className="grid grid-cols-2 gap-4">
-                {recipes.map(recipe => <RecipeCard
-                    recipeName={recipe.recipeName}
-                    cookTime={recipe.cookTime}
-                    ingredients={recipe.ingredients}
-                    authorName={recipe.authorName}
-                    rating={recipe.rating}
-                    description={recipe.description}
-                    directions={recipe.directions} />)}
+            <header className="bg-white shadow">
+                <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    <h1 className="text-3xl font-bold text-gray-900">Recipes</h1>
+                </div>
+            </header>
+            <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-4 gap-4">
+                    {recipes.map(recipe => <RecipeCardMini
+                        recipeName={recipe.recipeName}
+                        cookTime={recipe.cookTime}
+                        ingredients={recipe.ingredients}
+                        authorName={recipe.authorName}
+                        rating={recipe.rating}
+                        description={recipe.description}
+                        directions={recipe.directions} />)}
+                </div>
             </div>
-
         </>
     )
 }
