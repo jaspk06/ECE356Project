@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "dev-load": "nodemon src/scripts/loaddata.ts",
+    "process-data": "npx ts-node -T src/scripts/loaddata.ts",
     "build": "tsc",
     "prod": "npm run build && node build/index.js"
   },
