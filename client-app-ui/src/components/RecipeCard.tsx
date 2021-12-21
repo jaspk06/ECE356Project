@@ -3,10 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { Recipe } from "../types/Recipe";
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeftIcon } from "@heroicons/react/outline";
-import { Menu } from "@headlessui/react";
-import { UserIcon } from "@heroicons/react/solid";
 import Modal from "./Modal";
-import { useState } from "react";
 
 const fakeGetRecipe = (recipeId: number): Recipe => {
     return {
@@ -22,7 +19,6 @@ const fakeGetRecipe = (recipeId: number): Recipe => {
 
 export default function RecipeCard() {
     const { recipeId } = useParams<{ recipeId: string }>();
-    const [nutritionOpen, setNutritionOpen] = useState(false);
     const navigate = useNavigate();
 
     const { recipeName, cookTime, ingredients, authorName, rating, description, directions } = fakeGetRecipe(parseInt(recipeId ? recipeId : "-1"));

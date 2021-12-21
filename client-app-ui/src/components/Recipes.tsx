@@ -1,4 +1,3 @@
-import RecipeCard from "./RecipeCard"
 import RecipeCardMini from "./RecipeCardMini"
 
 const recipes = [

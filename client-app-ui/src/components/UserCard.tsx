@@ -1,7 +1,3 @@
-import StarRating from "./StarRating";
-import { useParams } from "react-router-dom";
-import { UserDisplay } from "../types/UserDisplay";
-
 export default function UserCard() {
     return (
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">

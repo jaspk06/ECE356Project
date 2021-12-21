@@ -1,20 +1,8 @@
-import { Fragment } from 'react'
 import {
-    BriefcaseIcon,
     CalendarIcon,
-    CheckIcon,
-    ChevronDownIcon,
-    CurrencyDollarIcon,
-    LinkIcon,
-    LocationMarkerIcon,
     PencilIcon,
 } from '@heroicons/react/solid'
-import { Menu, Transition } from '@headlessui/react'
 import { UserDisplay } from '../types/UserDisplay'
-
-function classNames(...classes: Array<string>) {
-    return classes.filter(Boolean).join(' ')
-}
 
 export default function Heading(props: UserDisplay) {
     const { firstName, lastName, dateJoined } = props;
