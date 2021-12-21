@@ -15,4 +15,4 @@ COPY . .
 
 EXPOSE 8080
 # RUN depending on environment
-# ENTRYPOINT ["npm", "run"]
+ENTRYPOINT ["yarn"]
