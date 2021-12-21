@@ -38,8 +38,7 @@ services:
             - ./client-app/data:/usr/src/app/data
             - ./client-app/src:/usr/src/app/src
             - ./client-app/nodemon.json:/usr/src/app/nodemon.json
-        stdin_open: true
-        tty: true
+        command: dev
 
     client-app-ui:
         build:
