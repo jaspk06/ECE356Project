@@ -1,0 +1,158 @@
+{
+	"info": {
+		"_postman_id": "343c7feb-1436-4cb3-b22e-cc212d2f60ab",
+		"name": "356",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "recipepost1",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ID\": \"12\",\n    \"title\": \"pasta\",\n    \"time\": 12,\n    \"ingredients\": [\"cumin\", \"oooo\"],\n    \"tags\": [\"funky\"],\n    \"steps\": [\"get bowl\", \"mix\", \"eat\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/recipe/124",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"recipe",
+						"124"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ingredientPost",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ingredientName\":  \"testIng1\",\n    \"aliasID\": 12\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/ingredient/124",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"ingredient",
+						"124"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ingredientGet",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ingredientName\":  \"hershey's semi-sweet baking chocolate\",\n    \"aliasID\": 12\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/ingredient/124",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"ingredient",
+						"124"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "recipeget1 Copy",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ID\": \"12\",\n    \"title\": \"pasta\",\n    \"time\": 12,\n    \"ingredients\": [\"cum\", \"oooo\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/recipe/124",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"recipe",
+						"124"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "recipeget2",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/recipe/124",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"recipe",
+						"124"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
