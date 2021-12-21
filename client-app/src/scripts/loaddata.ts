@@ -12,20 +12,6 @@ import { RecipeNutrition } from 'types/nutrition';
 import { Step } from 'types/step';
 import { Review } from 'types/reviews';
 
-
-interface RecipeCSV {
-    'Recipe Name': string,
-    RecipeID: number,
-    'Review Count': number,
-    'Recipe Photo': string,
-    Author: string,
-    'Prepare Time': string,
-    'Cook Time': string,
-    'Total Time': string,
-    Ingredients: string,
-    Directions: string
-}
-
 interface PPRecipeCSV {
     id: number,
     i: number,
