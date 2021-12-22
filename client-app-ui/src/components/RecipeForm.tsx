@@ -1,6 +1,24 @@
+import { MinusIcon } from "@heroicons/react/outline";
+import axios from "axios";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { baseURL } from "../utils";
+const regexNumbers = /^[0-9\b]+$/;
 
 export default function Example() {
+    const [form, setForm] = useState({ recipeName: "", cookTime: 0, description: "", ingredients: [""], directions: [""], tags: [""], steps: [], nutrition: { calories: 0, saturatedFat: 0, totalFat: 0, sugar: 0, sodium: 0, protein: 0 } })
+    const userId = localStorage.getItem("userId");
+    const handleArray = (ingredients: Array<string>, index: number, value: string) => {
+        const temp = ingredients;
+        temp[index] = value;
+        return temp;
+    }
+
+    const createRecipe = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        axios.post(`${baseURL}recipe/${userId}`, form).then(res => console.log(res));
+    }
+
     return (
         <>
             <header className="bg-white shadow">
@@ -11,7 +29,7 @@ export default function Example() {
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                 <div className="mt-10 sm:mt-0">
                     <div className="mt-5 md:mt-0 md:col-span-2">
-                        <form action="#" method="POST">
+                        <form onSubmit={createRecipe}>
                             <div className="shadow overflow-hidden sm:rounded-md">
                                 <div className="px-4 py-5 bg-white sm:p-6">
                                     <div className="grid grid-cols-6 gap-6">
@@ -25,6 +43,8 @@ export default function Example() {
                                                 type="text"
                                                 name="recipe-title"
                                                 id="recipe-title"
+                                                required
+                                                placeholder="Recipe Title"
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -38,59 +58,14 @@ export default function Example() {
                                                     id="description"
                                                     name="description"
                                                     rows={3}
+                                                    required
                                                     className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
                                                     placeholder="Description"
                                                     defaultValue={''}
                                                 />
                                             </div>
                                         </div>
-
-                                        <div className="col-span-3 mt-1">
-                                            <label htmlFor="ingredients" className="block text-sm font-medium text-gray-700">
-                                                Ingredients
-                                            </label>
-                                            <div className="mt-1">
-                                                <textarea
-                                                    id="ingredients"
-                                                    name="ingredients"
-                                                    rows={3}
-                                                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                                    placeholder="Ingredients seperated by commas"
-                                                    defaultValue={''}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="col-span-3 mt-1">
-                                            <label htmlFor="directions" className="block text-sm font-medium text-gray-700">
-                                                Directions
-                                            </label>
-                                            <div className="mt-1">
-                                                <textarea
-                                                    id="directions"
-                                                    name="directions"
-                                                    rows={3}
-                                                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                                    placeholder="Directions"
-                                                    defaultValue={''}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="col-span-6 sm:col-span-3">
-                                            <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
-                                                Tags
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="tags"
-                                                id="tags"
-                                                placeholder="Tags seperated by commas"
-                                                className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                            />
-                                        </div>
-
-                                        <div className="col-span-6 sm:col-span-3">
+                                        <div className="col-span-1">
                                             <label htmlFor="cook-time" className="block text-sm font-medium text-gray-700">
                                                 Cook Time
                                             </label>
@@ -98,8 +73,119 @@ export default function Example() {
                                                 type="number"
                                                 name="cook-time"
                                                 id="cook-time"
+                                                min="0"
+                                                required
+                                                value={form.cookTime}
+                                                onChange={e => {
+                                                    if (e.target.value === '' || regexNumbers.test(e.target.value))
+                                                        setForm({ ...form, cookTime: parseInt(e.target.value) })
+                                                }}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
+                                        </div>
+                                        <div className="col-span-1 mt-1">
+                                            <label htmlFor="ingredients" className="block text-sm font-medium text-gray-700">
+                                                Ingredients
+                                            </label>
+                                            {form.ingredients.map((ingredient, i) =>
+                                                <div className="flex">
+                                                    <input
+                                                        key={`ingredient-${i}`}
+                                                        type="text"
+                                                        name={`ingredient-${i}`}
+                                                        id={`ingredient-${i}`}
+                                                        placeholder="Ingredient Name"
+                                                        onChange={(e) => setForm({ ...form, ingredients: handleArray(form.ingredients, i, e.target.value) })}
+                                                        required
+                                                        className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                                    />
+                                                    <button
+                                                        onClick={() => setForm({ ...form, ingredients: form.ingredients.filter(a => a !== ingredient) })}
+                                                        type="button"
+                                                        className="p-1 rounded-full text-red-500 hover:text-red-700 focus:outline-none"
+                                                    >
+                                                        <MinusIcon className="h-6 w-6" aria-hidden="true" />
+                                                    </button>
+                                                </div>
+
+                                            )}
+                                            <button
+                                                onClick={() => setForm({ ...form, ingredients: form.ingredients.concat([""]) })}
+                                                type="button"
+                                                className="mt-1 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-black hover:text-white bg-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                            >
+                                                Add
+                                            </button>
+                                        </div>
+
+                                        <div className="col-span-1">
+                                            <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
+                                                Tags
+                                            </label>
+                                            {form.tags.map((tag, i) =>
+                                                <div className="flex">
+                                                    <input
+                                                        key={`tag-${i}`}
+                                                        type="text"
+                                                        name={`tag-${i}`}
+                                                        id={`tag-${i}`}
+                                                        placeholder={`Tag Name`}
+                                                        onChange={(e) => setForm({ ...form, tags: handleArray(form.tags, i, e.target.value) })}
+                                                        required
+                                                        className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                                    />
+                                                    <button
+                                                        onClick={() => setForm({ ...form, tags: form.tags.filter(d => d !== tag) })}
+                                                        type="button"
+                                                        className="p-1 rounded-full text-red-500 hover:text-red-700 focus:outline-none"
+                                                    >
+                                                        <MinusIcon className="h-6 w-6" aria-hidden="true" />
+                                                    </button>
+                                                </div>
+
+                                            )}
+                                            <button
+                                                onClick={() => setForm({ ...form, tags: form.tags.concat([""]) })}
+                                                type="button"
+                                                className="mt-1 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-black hover:text-white bg-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                            >
+                                                Add
+                                            </button>
+                                        </div>
+
+                                        <div className="col-span-3 mt-1">
+                                            <label htmlFor="directions" className="block text-sm font-medium text-gray-700">
+                                                Directions
+                                            </label>
+                                            {form.directions.map((direction, i) =>
+                                                <div className="flex">
+                                                    <input
+                                                        key={`direction-${i}`}
+                                                        type="text"
+                                                        name={`direction-${i}`}
+                                                        id={`direction-${i}`}
+                                                        placeholder={`Step ${i + 1}`}
+                                                        onChange={(e) => setForm({ ...form, directions: handleArray(form.directions, i, e.target.value) })}
+                                                        required
+                                                        className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                                    />
+                                                    <button
+                                                        onClick={() => setForm({ ...form, directions: form.directions.filter(d => d !== direction) })}
+                                                        type="button"
+                                                        className="p-1 rounded-full text-red-500 hover:text-red-700 focus:outline-none"
+                                                    >
+                                                        <MinusIcon className="h-6 w-6" aria-hidden="true" />
+                                                    </button>
+                                                </div>
+
+                                            )}
+                                            <button
+                                                onClick={() => setForm({ ...form, directions: form.directions.concat([""]) })}
+                                                type="button"
+                                                className="mt-1 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-black hover:text-white bg-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                            >
+                                                Add
+                                            </button>
                                         </div>
                                         <div className="col-span-6"> <h3 className="text-lg font-medium leading-6 text-gray-900">Nutrition Information</h3></div>
                                         <div className="col-span-2 sm:col-span-1">
@@ -110,6 +196,13 @@ export default function Example() {
                                                 type="number"
                                                 name="calories"
                                                 id="calories"
+                                                min="0"
+                                                value={form.nutrition.calories}
+                                                required
+                                                onChange={e => {
+                                                    if (e.target.value === '' || regexNumbers.test(e.target.value))
+                                                        setForm({ ...form, nutrition: { ...form.nutrition, calories: parseInt(e.target.value) } })
+                                                }}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -122,6 +215,12 @@ export default function Example() {
                                                 type="number"
                                                 name="total-fat"
                                                 id="total-fat"
+                                                min="0"
+                                                value={form.nutrition.totalFat}
+                                                onChange={e => {
+                                                    if (e.target.value === '' || regexNumbers.test(e.target.value))
+                                                        setForm({ ...form, nutrition: { ...form.nutrition, totalFat: parseInt(e.target.value) } })
+                                                }}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -133,6 +232,13 @@ export default function Example() {
                                                 type="number"
                                                 name="sugar"
                                                 id="sugar"
+                                                min="0"
+                                                required
+                                                value={form.nutrition.sugar}
+                                                onChange={e => {
+                                                    if (e.target.value === '' || regexNumbers.test(e.target.value))
+                                                        setForm({ ...form, nutrition: { ...form.nutrition, sugar: parseInt(e.target.value) } })
+                                                }}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -144,6 +250,13 @@ export default function Example() {
                                                 type="number"
                                                 name="sodium"
                                                 id="sodium"
+                                                min="0"
+                                                value={form.nutrition.sodium}
+                                                required
+                                                onChange={e => {
+                                                    if (e.target.value === '' || regexNumbers.test(e.target.value))
+                                                        setForm({ ...form, nutrition: { ...form.nutrition, sodium: parseInt(e.target.value) } })
+                                                }}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -155,6 +268,13 @@ export default function Example() {
                                                 type="number"
                                                 name="protein"
                                                 id="protein"
+                                                min="0"
+                                                value={form.nutrition.protein}
+                                                required
+                                                onChange={e => {
+                                                    if (e.target.value === '' || regexNumbers.test(e.target.value))
+                                                        setForm({ ...form, nutrition: { ...form.nutrition, protein: parseInt(e.target.value) } })
+                                                }}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -166,6 +286,13 @@ export default function Example() {
                                                 type="number"
                                                 name="saturated-fat"
                                                 id="saturated-fat"
+                                                min="0"
+                                                value={form.nutrition.saturatedFat}
+                                                required
+                                                onChange={e => {
+                                                    if (e.target.value === '' || regexNumbers.test(e.target.value))
+                                                        setForm({ ...form, nutrition: { ...form.nutrition, saturatedFat: parseInt(e.target.value) } })
+                                                }}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -191,7 +318,7 @@ export default function Example() {
                         </form>
                     </div>
                 </div>
-            </div>
+            </div >
         </>
     )
 }
