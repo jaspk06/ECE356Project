@@ -36,7 +36,7 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
             recipeQuery+= ` AND name LIKE "%`+ name + `%"`;
         }
         if(!(cookTime === undefined) ){
-            recipeQuery+= ` AND cookTime < `+ cookTime + ` `;
+            recipeQuery+= ` AND cookTime <= `+ cookTime + ` `;
         }
 
         recipeQuery += ") ";
