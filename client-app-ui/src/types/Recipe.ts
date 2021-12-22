@@ -15,7 +15,8 @@ export interface RecipeMini {
     recipeID: number,
     name: string,
     cookTime: number,
-    authorName: string,
+    firstName: string,
+    lastName: string,
     rating: number,
     description: string
 }

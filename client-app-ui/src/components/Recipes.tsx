@@ -7,6 +7,7 @@ import RecipeCardMini from "./RecipeCardMini"
 export default function Recipes() {
     const [recipes, setRecipes] = useState<Array<RecipeMini>>()
     const [page, setPage] = useState(0);
+    console.log(recipes)
     useEffect(() => {
         axios.get(`${baseURL}recipe`, { params: { page } }).then(res =>
             setRecipes(res.data.map((recipe: any) => ({ ...recipe, rating: recipe.Rating })))
@@ -25,7 +26,8 @@ export default function Recipes() {
                         recipeID={recipe.recipeID}
                         name={recipe.name}
                         cookTime={recipe.cookTime}
-                        authorName={recipe.authorName}
+                        firstName={recipe.firstName}
+                        lastName={recipe.lastName}
                         rating={recipe.rating}
                         description={recipe.description} />)}
                 </div>
