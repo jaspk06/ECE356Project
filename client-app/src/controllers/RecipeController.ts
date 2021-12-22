@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import { maxHeaderSize } from 'http';
+import { Ingredient } from 'types/ingredients';
+import { Step } from 'types/step';
 import { db } from '../app';
 
 const RecipeController: Router = Router();
@@ -159,6 +160,41 @@ RecipeController.get('/', async (req: Request, res: Response, next: NextFunction
     }
 });
 
+
+RecipeController.get('/:recipeID', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { recipeID } = req.params;
+
+        const recipeQuery = `SELECT * FROM Recipe WHERE recipeID=${recipeID}`;
+        const ret = JSON.parse(JSON.stringify(await db.promise().query(recipeQuery)))[0];
+
+        if (ret.length === 0)
+            res.status(404).send("Recipe does not exist");
+
+        const recipe = ret[0];
+
+        const reviewsQuery = `SELECT review,date,rating,firstName,lastName, Reviews.userID FROM Reviews INNER JOIN Users ON Reviews.userID = Users.userID WHERE recipeID=${recipeID} ORDER BY date DESC`;
+        recipe.reviews = JSON.parse(JSON.stringify(await db.promise().query(reviewsQuery)))[0];
+
+        const userQuery = `SELECT firstName,lastName FROM Users WHERE userID=${recipe.authorID}`;
+        const author = JSON.parse(JSON.stringify(await db.promise().query(userQuery)))[0][0];
+        recipe.authorName = author.firstName + ' ' + author.lastName;
+
+        const directionsQuery = `SELECT * FROM RecipeDirections WHERE recipeID=${recipeID} ORDER BY step ASC`;
+        recipe.directions = JSON.parse(JSON.stringify(await db.promise().query(directionsQuery)))[0].map((step: Step) => step.description);
+
+        const recipeIngredientsQuery = `SELECT DISTINCT ingredientName FROM RecipeIngredients INNER JOIN Ingredients ON RecipeIngredients.ingredientID = Ingredients.ingredientID WHERE recipeID=${recipeID}`;
+        recipe.ingredients = JSON.parse(JSON.stringify(await db.promise().query(recipeIngredientsQuery)))[0].map((ingredient: Ingredient) => ingredient.ingredientName);
+
+        const nutritionQuery = `SELECT * FROM RecipeNutritionInformation WHERE recipeID=${recipeID}`;
+        recipe.nutrition = JSON.parse(JSON.stringify(await db.promise().query(nutritionQuery)))[0][0];
+
+        res.status(200).json(recipe);
+    } catch (error) {
+        console.error(error)
+        next(error);
+    }
+});
 
 
 // creating a recipe - add authentication later
