@@ -2,6 +2,7 @@ import { parse } from 'csv-parse';
 import fs from 'fs';
 import { Parser } from 'json2csv';
 import faker from 'faker';
+import mysql from 'mysql2';
 
 import { Recipe } from 'types/recipes';
 import { RecipeIngredients } from 'types/recipeIngredients';
@@ -62,11 +63,20 @@ interface FullIngredientsCSV {
     id: number
 }
 
+const db = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: parseInt(process.env.DB_PORT || "3306")
+});
+db.connect();
+
 (() => {
     console.log("loading ingredients...")
     const ingredients: Array<Ingredient> = [];
     const ingredientAliases: Array<IngredientAlias> = [];
-    let count = 0;
+    let count = 1;
     const startTime = performance.now();
     const parser1 = new Parser();
     const parser2 = new Parser();
@@ -92,6 +102,7 @@ interface FullIngredientsCSV {
         .on('end', async () => {
             console.log("Parsing objects...")
             ingredients.sort((a, b) => a.ingredientId - b.ingredientId);
+            ingredients.shift(); //remove the ingredient with id 0
             const csvIngredients = parser1.parse(ingredients);
             const csvAlias = parser2.parse(ingredientAliases);
 
@@ -123,7 +134,16 @@ interface FullIngredientsCSV {
             users.push({ userId: row.u, firstName: faker.name.firstName(), lastName: faker.name.lastName(), email: faker.internet.email(), phoneNumber: faker.phone.phoneNumber(), gender: faker.name.gender(), birthday: faker.date.between(1950, new Date().getFullYear() - 12), dateJoined: faker.date.between(2000, new Date()) })
         })
         .on('end', async () => {
-            console.log("Parsing objects...")
+            console.log("Parsing objects...");
+
+            //generating users
+            const recipeRows: Array<number> = JSON.parse(JSON.stringify(await db.promise().query('SELECT authorID FROM Recipe WHERE authorID NOT IN (select userID from Users)')))[0].map((a: { authorID: number }) => a.authorID);
+            const reviewRows: Array<number> = JSON.parse(JSON.stringify(await db.promise().query('SELECT userID FROM Reviews WHERE userID NOT IN (select userID from Users)')))[0].map((a: { userID: number }) => a.userID);
+            const rows = Array.from(new Set(recipeRows.concat(reviewRows)));
+            rows.forEach(row => {
+                users.push({ userId: row, firstName: faker.name.firstName(), lastName: faker.name.lastName(), email: faker.internet.email(), phoneNumber: faker.phone.phoneNumber(), gender: faker.name.gender(), birthday: faker.date.between(1950, new Date().getFullYear() - 12), dateJoined: faker.date.between(2000, new Date()) })
+            })
+            users.sort((a, b) => a.userId - b.userId);
             const csvUsers = parser.parse(users);
 
             console.log("Parsed objects. Writing to csv files...")
@@ -181,8 +201,8 @@ interface FullIngredientsCSV {
             }
         })
         .on('end', async () => {
-            // ingredients.sort((a, b) => a.ingredientId - b.ingredientId);
             console.log("Parsing objects...")
+            recipes.sort((a, b) => a.recipeId - b.recipeId);
             const csvRecipes = parser1.parse(recipes);
             const csvRecipeTags = parser2.parse(recipeTags);
             const csvTags = parser3.parse(tags);
@@ -218,7 +238,7 @@ interface FullIngredientsCSV {
         }))
         .on('data', (row: PPRecipeCSV) => {
             const parsedIngredients: Array<number> = JSON.parse(row.ingredient_ids);
-            parsedIngredients.forEach(ingredientId => recipeIngredients.push({ recipeId: row.id, ingredientId: ingredientId }));
+            parsedIngredients.forEach(ingredientId => (ingredientId > 0 && recipeIngredients.push({ recipeId: row.id, ingredientId: ingredientId })));
         })
         .on('end', async () => {
             console.log("Parsing objects...")
@@ -248,7 +268,7 @@ interface FullIngredientsCSV {
             columns: true
         }))
         .on('data', (row: RAWInteractionsCSV) => {
-            reviews.push({ recipeId: row.recipe_id, userId: row.user_id, rating: row.rating, date: row.date, review: row.review });
+            reviews.push({ recipeId: row.recipe_id, userId: row.user_id, rating: row.rating, date: row.date, review: row.review.toString().replace(/(\r\n|\n|\r)/gm, " ") });
         })
         .on('end', async () => {
             console.log("Parsing objects...")
