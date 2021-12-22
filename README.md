@@ -39,9 +39,6 @@ If you are missing the CSV data files
 
 2. Move it to the directory `ECE356Project/client-app/data/*.csv`
 
-
-    
-
 This is what your directory tree should look like:
 
 ```
@@ -60,13 +57,11 @@ This is what your directory tree should look like:
 
 ```
 
-  
-
 [Click here](https://dbdiagram.io/d/61a168448c901501c0d4b260) to view the diagram of the schema
 
   ## Loading Data
 In order to populate the database with the CSVs, they must be moved to inside the container of the MySQL instance. To achieve this, run the command 
-`docker cp ./client-app/data/<CSV_NAME>.csv db:var/lib/mysql`.
+`sh copytodocker.sh`.
 
 After all the appropriate CSVs have been copied, they can be loaded. For our environment, we can use the command 
 
@@ -74,6 +69,8 @@ After all the appropriate CSVs have been copied, they can be loaded. For our env
 For example, loading ingredients would look like
 
     LOAD DATA LOCAL INFILE 'var/lib/mysql/PARSED_ingredients.csv' INTO TABLE Ingredients FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS (aliasID, ingredientName);
+    
+Refer to [this guide](https://stackoverflow.com/a/60717467/13013612) to enable file loading. After logging into the MySQL CLI with file loading enabled, run `createtables.sql`
 
 # Features
 
