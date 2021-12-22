@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express';
+import { maxHeaderSize } from 'http';
 import { db } from '../app';
 
 const RecipeController: Router = Router();
@@ -10,7 +11,7 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         // query for recipes
         let result;
 
-        let { recipeID, name, authorID, cookTime, ingredients, steps, date, description, tags } = req.body;
+        let { recipeID, name, authorID, cookTime, ingredients, steps, date, description, tags, rating } = req.body;
         console.log(req.body);
         
         let ingredientFlag = false;
@@ -21,6 +22,12 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         /////////////////////////////////
         authorID = parseInt(authorID);
         recipeID = parseInt(recipeID);
+        // rating = parseInt(rating);
+
+        // if((rating === undefined) || (isNaN(rating)) ){
+        //     rating = 5;
+        // }
+
 
         let query = "with RecipeQuery as "
         let recipeQuery = `( SELECT * FROM Recipe `;
@@ -109,38 +116,13 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
 
             query += tagQuery;
 
-
-/////////////////////////////////
-
-
-
-
-            // tagFlag = true;
-            // let firstFlag = true;
-
-            // let tagQuery = `, TagQuery as ( SELECT * FROM Tags `;
-            // tagQuery += "WHERE ";
-
-
-            // for(const tag in tags){
-            //     ingredientsQuery += `, Ingredient`+ ingredientCount+` as ( WITH IngredientQuery AS (SELECT * FROM Ingredients `;
-            //     if(firstFlag){
-            //         firstFlag = false;
-            //         tagQuery+= ` tag LIKE '%` +tags[tag]+`%' `;
-            //     } else {
-            //         tagQuery+= ` and tag LIKE '%` +tags[tag]+`%' `;
-            //     }
-            // }
-
-            // tagQuery += ")";
-
-            // query += tagQuery;
-            // const RecipeWithTag = ', RecipeWithTags as (select * from RecipeTags where tagID in (select tagID from TagQuery)) '
-            // query += RecipeWithTag;
         }
-
         /////////////////////////////
-        query += "select distinct recipeID, RecipeQuery.name from  RecipeQuery ";
+        // ratings
+
+        query+= ", Reviews AS (Select recipeID, avg(rating) as Rating from Reviews where recipeID in (select recipeID from RecipeQuery) GROUP BY recipeID)"
+        /////////////////////////////
+        query += "select distinct * from  RecipeQuery ";
         if(ingredientFlag){
             for(let i = 1; i < ingredientCount;i++){
                 query+= " inner join Ingredient"+(i)+" using(recipeID)";
@@ -153,6 +135,7 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
             }
         }
 
+        query+= " inner join Reviews using(recipeID) where Rating >=" +Math.min(5, rating)
                
         console.log(" query: " + query);
 
