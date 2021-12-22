@@ -124,7 +124,7 @@ RecipeController.get('/', async (req: Request, res: Response, next: NextFunction
 
         query+= ", Reviews AS (Select recipeID, avg(rating) as Rating from Reviews where recipeID in (select recipeID from RecipeQuery) GROUP BY recipeID)"
         /////////////////////////////
-        query += "select distinct * from  RecipeQuery ";
+        query += "SELECT DISTINCT recipeID, RecipeQuery.name, firstName, lastName, cookTIme, date, description, rating from  RecipeQuery ";
         if(ingredientFlag){
             for(let i = 1; i < ingredientCount;i++){
                 query+= " inner join Ingredient"+(i)+" using(recipeID)";
@@ -137,9 +137,11 @@ RecipeController.get('/', async (req: Request, res: Response, next: NextFunction
             }
         }
 
-        query+= " inner join Reviews using(recipeID) where Rating >=" +Math.min(5, rating)
+        query += "INNER JOIN Users on Users.userID = RecipeQuery.authorID";
+        query+= " inner join Reviews using(recipeID) where Rating >=" +Math.min(5, rating)+ " order by Rating DESC"
 
         query += ` LIMIT 25 OFFSET ${page}`
+
                
         console.log(" query: " + query);
 
