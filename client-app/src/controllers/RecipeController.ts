@@ -109,38 +109,13 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
 
             query += tagQuery;
 
-
-/////////////////////////////////
-
-
-
-
-            // tagFlag = true;
-            // let firstFlag = true;
-
-            // let tagQuery = `, TagQuery as ( SELECT * FROM Tags `;
-            // tagQuery += "WHERE ";
-
-
-            // for(const tag in tags){
-            //     ingredientsQuery += `, Ingredient`+ ingredientCount+` as ( WITH IngredientQuery AS (SELECT * FROM Ingredients `;
-            //     if(firstFlag){
-            //         firstFlag = false;
-            //         tagQuery+= ` tag LIKE '%` +tags[tag]+`%' `;
-            //     } else {
-            //         tagQuery+= ` and tag LIKE '%` +tags[tag]+`%' `;
-            //     }
-            // }
-
-            // tagQuery += ")";
-
-            // query += tagQuery;
-            // const RecipeWithTag = ', RecipeWithTags as (select * from RecipeTags where tagID in (select tagID from TagQuery)) '
-            // query += RecipeWithTag;
         }
-
         /////////////////////////////
-        query += "select distinct recipeID, RecipeQuery.name from  RecipeQuery ";
+        // ratings
+
+        query+= ", Reviews AS (Select recipeID, avg(rating) as Rating from Reviews where recipeID in (select recipeID from RecipeQuery) GROUP BY recipeID)"
+        /////////////////////////////
+        query += "select distinct * from  RecipeQuery ";
         if(ingredientFlag){
             for(let i = 1; i < ingredientCount;i++){
                 query+= " inner join Ingredient"+(i)+" using(recipeID)";
@@ -153,6 +128,7 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
             }
         }
 
+        query+= " inner join Reviews using(recipeID)"
                
         console.log(" query: " + query);
 
