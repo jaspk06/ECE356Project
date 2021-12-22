@@ -183,18 +183,11 @@ RecipeController.post('/:userId', async (req: Request, res: Response, next: Next
         // create the recipe
         const { name, cookTime, ingredients, steps, description, tags } = req.body;
 
-        console.log(req.body);
-
         const recipeInsert = `INSERT INTO Recipe (name, authorID, cookTime, date, description ) VALUES(?, ?, ?, ?, ?)`;
 
-        let values = [name, userId, cookTime, date, description];
-
-        const recipeID = JSON.parse(JSON.stringify(await db.promise().query(recipeInsert, values)))[0].insertId;
-
-        console.log(" query: " + recipeInsert);
+        const recipeID = JSON.parse(JSON.stringify(await db.promise().query(recipeInsert, [name, userId, cookTime, date, description])))[0].insertId;
 
         // insert the ingredients
-
         for (const ingredient of ingredients) {
             const getIngredients = `SELECT ingredientID, ingredientName FROM Ingredients WHERE ingredientName='${ingredient}'`
 
@@ -213,26 +206,17 @@ RecipeController.post('/:userId', async (req: Request, res: Response, next: Next
             }
         }
 
-        let stepCounter = 0 // steps
-
+        const stepInsert = `INSERT INTO RecipeDirections (recipeID, step, description ) VALUES(?, ?, ?)`;
         // insert the steps
-
-        for (const step of steps) {
-            const stepInsert = `INSERT INTO RecipeDirections (recipeID, step, description ) VALUES(?, ?, ?)`;
-
-            values = [recipeID, stepCounter, step];
-            stepCounter += 1;
-
-            console.log(values);
-            db.query(stepInsert, values, function (err, rows, fields) {
+        steps.forEach((step: string, i: number) => {
+            db.query(stepInsert, [recipeID, i, step], function (err, rows, fields) {
                 if (err) {
-                    console.error(err)
+                    res.status(500).json(err);
                 } else {
                     console.log(rows)
                 }
             })
-
-        }
+        })
 
         for (const tag of tags) {
             const getTags = `SELECT * FROM Tags WHERE tag='${tag}'`
