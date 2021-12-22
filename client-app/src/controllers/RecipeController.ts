@@ -81,28 +81,62 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         /////////////////////////////////
 
         if(!(tags === undefined) ){
+/////////////////////////////////
+
 
             tagFlag = true;
+
             let firstFlag = true;
-
-            let tagQuery = `, TagQuery as ( SELECT * FROM Tags `;
-            tagQuery += "WHERE ";
-
+            
+            let tagQuery= "";
 
             for(const tag in tags){
-                if(firstFlag){
-                    firstFlag = false;
-                    tagQuery+= ` tag LIKE '%` +tags[tag]+`%' `;
-                } else {
-                    tagQuery+= ` and tag LIKE '%` +tags[tag]+`%' `;
-                }
+
+                tagQuery += `, Tag`+ tagCount+` as ( WITH TagQuery AS (SELECT * FROM Tags `;
+                
+             
+    
+                
+                tagQuery += "WHERE ";
+                tagQuery += ` tag LIKE '%` +tags[tag]+`%'), `;
+                tagQuery += "RecipeWithTag as (select * from RecipeTags where tagID in (select tagID from TagQuery)) select distinct recipeID, name from  TagQuery inner join RecipeWithTag using(tagID) inner join Recipe using(recipeID))"
+                
+
+      
+                tagCount+=1;
             }
 
-            tagQuery += ")";
 
             query += tagQuery;
-            const RecipeWithTag = ', RecipeWithTags as (select * from RecipeTags where tagID in (select tagID from TagQuery)) '
-            query += RecipeWithTag;
+
+
+/////////////////////////////////
+
+
+
+
+            // tagFlag = true;
+            // let firstFlag = true;
+
+            // let tagQuery = `, TagQuery as ( SELECT * FROM Tags `;
+            // tagQuery += "WHERE ";
+
+
+            // for(const tag in tags){
+            //     ingredientsQuery += `, Ingredient`+ ingredientCount+` as ( WITH IngredientQuery AS (SELECT * FROM Ingredients `;
+            //     if(firstFlag){
+            //         firstFlag = false;
+            //         tagQuery+= ` tag LIKE '%` +tags[tag]+`%' `;
+            //     } else {
+            //         tagQuery+= ` and tag LIKE '%` +tags[tag]+`%' `;
+            //     }
+            // }
+
+            // tagQuery += ")";
+
+            // query += tagQuery;
+            // const RecipeWithTag = ', RecipeWithTags as (select * from RecipeTags where tagID in (select tagID from TagQuery)) '
+            // query += RecipeWithTag;
         }
 
         /////////////////////////////
@@ -114,7 +148,9 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
             
         }
         if(tagFlag){
-            query+= "inner join RecipeWithTags using(recipeID)";
+            for(let i = 1; i < tagCount;i++){
+                query+= " inner join Tag"+(i)+" using(recipeID)";
+            }
         }
 
                
