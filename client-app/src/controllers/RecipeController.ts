@@ -4,14 +4,12 @@ import { db } from '../app';
 
 const RecipeController: Router = Router();
 
-RecipeController.get('/:userId', async (req: Request, res: Response, next: NextFunction) => {
+RecipeController.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { userId } = req.params;
-
         // query for recipes
         let result;
 
-        let { recipeID, name, authorID, cookTime, ingredients, steps, date, description, tags, rating } = req.body;
+        let { recipeID, name, authorID, cookTime, ingredients, steps, date, description, tags, rating, page } = req.body;
         console.log(req.body);
         
         let ingredientFlag = false;
@@ -27,7 +25,10 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         if((rating === undefined) || (isNaN(rating)) ){
             rating = 0;
         }
-
+        if ((page === undefined) || (isNaN(page))) {
+            page = 0;
+        }
+        page = page * 25;
 
         let query = "with RecipeQuery as "
         let recipeQuery = `( SELECT * FROM Recipe `;
@@ -136,6 +137,8 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         }
 
         query+= " inner join Reviews using(recipeID) where Rating >=" +Math.min(5, rating)
+
+        query += ` LIMIT 25 OFFSET ${page}`
                
         console.log(" query: " + query);
 
