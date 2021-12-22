@@ -1,44 +1,21 @@
 import { NextFunction, Request, Response, Router } from 'express';
+import { validateEmail } from '../utils';
 import { db } from '../app';
 
 const UserController: Router = Router();
 
-UserController.get('/:userId', async (req: Request, res: Response, next: NextFunction) => {
+UserController.get('/:userID', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { userId } = req.params;
+        const userID = parseInt(req.params.userID);
 
-        // user details
-        let { userID, firstname, lastname } = req.body;
-
-        userID = parseInt(userID);
-
-        console.log(req.body);
-
-        let userQuery = `SELECT * FROM Users`;
-        userQuery += ` WHERE userID LIKE '%' `
-
-        userID = parseInt(userID);
-
-        if(!(userID === undefined) && !(isNaN(userID)) ){
-            userQuery+= ` AND userID = `+ userID + " ";
-        }
-        if(!(firstname === undefined)){
-            userQuery+= ` AND firstname = '`+ firstname + `' `;
-        }
-        if(!(lastname === undefined) ){
-            userQuery+= ` AND lastname = '`+ lastname + `' `;
-        }
-
-        let returnRes;
-        db.query( userQuery, function (err, rows, fields) {
+        const userQuery = `SELECT * FROM Users WHERE userID = ${userID}`;
+        db.query(userQuery, function (err, rows, fields) {
             if (err) {
-                console.log(err)
+                res.json(500).json(err);
             } else {
                 res.status(200).json(rows);
             }
         })
-        console.log(returnRes);
-        
     } catch (err) {
         console.error(err);
         next(err);
@@ -48,30 +25,25 @@ UserController.get('/:userId', async (req: Request, res: Response, next: NextFun
 
 
 // creating a user
-UserController.post('/:userId', async (req: Request, res: Response, next: NextFunction) => {
+UserController.post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { userId } = req.params;
-        // create the user
+        const { firstName, lastName, email, phoneNumber, gender } = req.body;
 
-        let result;
+        const userInsert = `INSERT INTO Users (firstName, lastName, email, phoneNumber, gender, birthday, dateJoined ) VALUES(?, ?, ?, ?, ?, ?, ?)`;
 
-        var { firstName, lastName, email, phoneNumber, gender, birthday, dateJoined } = req.body;
+        const birthday = new Date(req.body.birthday).toISOString().split('T')[0];
+        const dateJoined = new Date().toISOString().split('T')[0];
 
-        console.log(req.body);
+        if (!validateEmail(email)) res.status(400).send('Illegal email');
 
-        let userInsert = `INSERT INTO Users (firstName, lastName, email, phoneNumber, gender, birthday, dateJoined ) VALUES(?, ?, ?, ?, ?, ?, ?)`;
-
-        var values = [firstName, lastName, email, phoneNumber, gender, birthday, dateJoined];
-
-        db.query( userInsert, values, function (err, rows, fields) {
+        db.query(userInsert, [firstName, lastName, email, phoneNumber, gender, birthday, dateJoined], function (err, rows, fields) {
             if (err) {
-                console.log(err)
+                res.status(500).json(err);
             } else {
-                console.log(rows)
+                // @ts-ignore
+                res.status(201).json({ userID: rows.insertId });
             }
         })
-        
-        res.status(200).json("success");
     } catch (err) {
         console.error(err);
         next(err);
