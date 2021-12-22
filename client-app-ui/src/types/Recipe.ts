@@ -3,10 +3,12 @@ export interface Recipe {
     recipeName: string,
     cookTime: number,
     ingredients: Array<string>,
+    authorID: number,
     authorName: string,
     rating: number,
     description: string,
     directions: Array<string>,
+    reviews: Array<Review>,
     nutrition: Object
 }
 export interface RecipeMini {
@@ -24,4 +26,12 @@ export interface Nutrition {
     sodium: number,
     sugar: number,
     protein: number
+}
+export interface Review {
+    rating: number,
+    date: Date,
+    review: string,
+    userID: number,
+    firstName: string,
+    lastName: string
 }

@@ -122,22 +122,21 @@ export default function Navigation(props: any) {
                                                 leaveTo="transform opacity-0 scale-95"
                                             >
                                                 <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                                    {userNavigation.map((item) => (
-                                                        <Link to={item.href}>
-                                                            <Menu.Item key={item.name}>
-                                                                {({ active }) => (
-                                                                    <p
-                                                                        className={classNames(
-                                                                            active ? 'bg-gray-100' : '',
-                                                                            'block px-4 py-2 text-sm text-gray-700'
-                                                                        )}
-                                                                    >
-                                                                        {item.name}
-                                                                    </p>
-                                                                )}
-                                                            </Menu.Item>
-                                                        </Link>
-                                                    ))}
+                                                    <Link to={`users/${userId}`}>
+                                                        <Menu.Item>
+                                                            {({ active }) => (
+                                                                <p
+                                                                    className={classNames(
+                                                                        active ? 'bg-gray-100' : '',
+                                                                        'block px-4 py-2 text-sm text-gray-700'
+                                                                    )}
+                                                                >
+                                                                    Your Profile
+                                                                </p>
+                                                            )}
+                                                        </Menu.Item>
+                                                    </Link>
+
                                                     <Link to={"/"}>
                                                         <Menu.Item key={"sign-out"} onClick={() => { localStorage.removeItem("userId"); setSignedIn(false); }}>
                                                             {({ active }) => (

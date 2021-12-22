@@ -1,5 +1,6 @@
 export interface UserDisplay {
     firstName: string,
     lastName: string,
-    dateJoined: Date
+    dateJoined: Date,
+    userID: number
 }

@@ -12,10 +12,10 @@ export default function App() {
     <>
       <Navigation>
         <Routes>
-          <Route path="/recipes/:recipeId" element={<RecipeCard />} />
+          <Route path="/recipes/:recipeID" element={<RecipeCard />} />
           <Route path="/create/recipe" element={<RecipeForm />} />
           <Route path="/create/user" element={<UserForm />} />
-          <Route path="/users/:userId" element={<UserProfile />} />
+          <Route path="/users/:userID" element={<UserProfile />} />
           <Route path="/" element={<Recipes />} />
           <Route path="*" element={<Navigate replace to="/" />} />
         </Routes>

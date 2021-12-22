@@ -2,26 +2,32 @@ import Heading from './Heading'
 import UserCard from './UserCard'
 import { useParams } from 'react-router-dom'
 import { UserDisplay } from '../types/UserDisplay'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import { baseURL } from '../utils'
+import { User } from '../types/User'
 
-const fakeGetUser = (userId: number): UserDisplay => {
-    return {
-        firstName: "Greatest",
-        lastName: "Ever",
-        dateJoined: new Date()
-    }
-}
 
 
 
 export default function UserProfile() {
-    const { userId } = useParams<{ userId: string }>();
+    const { userID } = useParams<{ userID: string }>();
+    const [user, setUser] = useState<User>()
 
-    const { firstName, lastName, dateJoined } = fakeGetUser(parseInt(userId ? userId : "-1"));
+    useEffect(() => {
+        axios.get(`${baseURL}user/${userID}`).then(res => {
+            console.log(res.data)
+            setUser(res.data[0]);
+        })
+    }, [])
 
     return (
         <>
-            <Heading firstName={firstName} lastName={lastName} dateJoined={dateJoined} />
-            <UserCard />
+            {user &&
+                <>
+                    <Heading firstName={user.firstName} lastName={user.lastName} dateJoined={user.dateJoined} userID={user.userID} />
+                    <UserCard />
+                </>}
         </>
     )
 }
