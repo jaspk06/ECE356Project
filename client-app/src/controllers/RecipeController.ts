@@ -4,14 +4,12 @@ import { db } from '../app';
 
 const RecipeController: Router = Router();
 
-RecipeController.get('/:userId', async (req: Request, res: Response, next: NextFunction) => {
+RecipeController.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { userId } = req.params;
-
         // query for recipes
         let result;
 
-        let { recipeID, name, authorID, cookTime, ingredients, steps, date, description, tags, rating } = req.body;
+        let { recipeID, name, authorID, cookTime, ingredients, steps, date, description, tags, rating, page } = req.body;
         console.log(req.body);
         
         let ingredientFlag = false;
@@ -27,7 +25,10 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         if((rating === undefined) || (isNaN(rating)) ){
             rating = 0;
         }
-
+        if ((page === undefined) || (isNaN(page))) {
+            page = 0;
+        }
+        page = page * 25;
 
         let query = "with RecipeQuery as "
         let recipeQuery = `( SELECT * FROM Recipe `;
@@ -134,8 +135,12 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
                 query+= " inner join Tag"+(i)+" using(recipeID)";
             }
         }
+
         query += "INNER JOIN Users on Users.userID = RecipeQuery.authorID";
         query+= " inner join Reviews using(recipeID) where Rating >=" +Math.min(5, rating)+ " order by Rating DESC"
+
+        query += ` LIMIT 25 OFFSET ${page}`
+
                
         console.log(" query: " + query);
 
@@ -166,18 +171,11 @@ RecipeController.post('/:userId', async (req: Request, res: Response, next: Next
         // create the recipe
         const { name, cookTime, ingredients, steps, description, tags } = req.body;
 
-        console.log(req.body);
-
         const recipeInsert = `INSERT INTO Recipe (name, authorID, cookTime, date, description ) VALUES(?, ?, ?, ?, ?)`;
 
-        let values = [name, userId, cookTime, date, description];
-
-        const recipeID = JSON.parse(JSON.stringify(await db.promise().query(recipeInsert, values)))[0].insertId;
-
-        console.log(" query: " + recipeInsert);
+        const recipeID = JSON.parse(JSON.stringify(await db.promise().query(recipeInsert, [name, userId, cookTime, date, description])))[0].insertId;
 
         // insert the ingredients
-
         for (const ingredient of ingredients) {
             const getIngredients = `SELECT ingredientID, ingredientName FROM Ingredients WHERE ingredientName='${ingredient}'`
 
@@ -196,26 +194,17 @@ RecipeController.post('/:userId', async (req: Request, res: Response, next: Next
             }
         }
 
-        let stepCounter = 0 // steps
-
+        const stepInsert = `INSERT INTO RecipeDirections (recipeID, step, description ) VALUES(?, ?, ?)`;
         // insert the steps
-
-        for (const step of steps) {
-            const stepInsert = `INSERT INTO RecipeDirections (recipeID, step, description ) VALUES(?, ?, ?)`;
-
-            values = [recipeID, stepCounter, step];
-            stepCounter += 1;
-
-            console.log(values);
-            db.query(stepInsert, values, function (err, rows, fields) {
+        steps.forEach((step: string, i: number) => {
+            db.query(stepInsert, [recipeID, i, step], function (err, rows, fields) {
                 if (err) {
-                    console.error(err)
+                    res.status(500).json(err);
                 } else {
                     console.log(rows)
                 }
             })
-
-        }
+        })
 
         for (const tag of tags) {
             const getTags = `SELECT * FROM Tags WHERE tag='${tag}'`

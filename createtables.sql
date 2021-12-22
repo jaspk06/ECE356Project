@@ -1,4 +1,3 @@
---dropping all tables
 use recipes_db;
 SET
   FOREIGN_KEY_CHECKS = 0;
@@ -26,7 +25,6 @@ EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 SET
   FOREIGN_KEY_CHECKS = 1;
---recreating tables
   CREATE TABLE Recipe (
     recipeID int PRIMARY KEY,
     name varchar(255),
@@ -102,8 +100,7 @@ CREATE TABLE UserFollowing (
     followingUserID int,
     PRIMARY KEY (userID, followingUserID)
   );
---Load the data
-  LOAD DATA LOCAL INFILE 'var/lib/mysql/PARSED_ingredients.csv' INTO TABLE Ingredients FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS (ingredientID, aliasID, ingredientName);
+LOAD DATA LOCAL INFILE 'var/lib/mysql/PARSED_ingredients.csv' INTO TABLE Ingredients FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS (ingredientID, aliasID, ingredientName);
 LOAD DATA LOCAL INFILE 'var/lib/mysql/PARSED_alias.csv' INTO TABLE IngredientAlias FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS (aliasID, alias);
 LOAD DATA LOCAL INFILE 'var/lib/mysql/PARSED_directions.csv' INTO TABLE RecipeDirections FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS (recipeID, step, description);
 LOAD DATA LOCAL INFILE 'var/lib/mysql/PARSED_nutrition.csv' INTO TABLE RecipeNutritionInformation FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS (
@@ -137,7 +134,25 @@ LOAD DATA LOCAL INFILE 'var/lib/mysql/PARSED_users.csv' INTO TABLE Users FIELDS 
     dateJoined
   );
 LOAD DATA LOCAL INFILE 'var/lib/mysql/PARSED_tags.csv' INTO TABLE Tags FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS (tagID, tag);
---delete rows that do not have matching foreign keys
+
+DELETE FROM
+  RecipeDirections
+WHERE
+  recipeID NOT IN (
+    select
+      recipeID
+    from
+      Recipe
+  );
+DELETE FROM
+  RecipeNutritionInformation
+WHERE
+  recipeID NOT IN (
+    select
+      recipeID
+    from
+      Recipe
+  );
 DELETE FROM
   RecipeIngredients
 WHERE
@@ -165,7 +180,6 @@ WHERE
     from
       Recipe
   );
--- setting each table to auto increment
 ALTER TABLE
   Recipe
 MODIFY
@@ -186,7 +200,6 @@ ALTER TABLE
   Users
 MODIFY
   COLUMN userID INT NOT NULL AUTO_INCREMENT;
--- set foreign keys
 ALTER TABLE
   Recipe
 ADD
