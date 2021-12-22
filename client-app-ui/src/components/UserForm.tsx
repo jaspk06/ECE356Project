@@ -1,6 +1,15 @@
+import axios from "axios";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { baseURL } from "../utils";
 
 export default function UserForm() {
+    const [form, setForm] = useState({ firstName: "", lastName: "", email: "", phoneNumber: "", birthday: "", gender: "" })
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        axios.post(`${baseURL}user`, form).then(res => console.log(res));
+    }
     return (
         <>
             <header className="bg-white shadow">
@@ -11,7 +20,7 @@ export default function UserForm() {
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                 <div className="mt-10 sm:mt-0">
                     <div className="mt-5 md:mt-0 md:col-span-2">
-                        <form action="#" method="POST">
+                        <form onSubmit={handleSubmit}>
                             <div className="shadow overflow-hidden sm:rounded-md">
                                 <div className="px-4 py-5 bg-white sm:p-6">
                                     <div className="grid grid-cols-6 gap-6">
@@ -24,6 +33,8 @@ export default function UserForm() {
                                                 name="first-name"
                                                 id="first-name"
                                                 autoComplete="given-name"
+                                                value={form.firstName}
+                                                onChange={e => setForm({ ...form, firstName: e.target.value })}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -37,6 +48,8 @@ export default function UserForm() {
                                                 name="last-name"
                                                 id="last-name"
                                                 autoComplete="family-name"
+                                                value={form.lastName}
+                                                onChange={e => setForm({ ...form, lastName: e.target.value })}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -50,6 +63,8 @@ export default function UserForm() {
                                                 name="email-address"
                                                 id="email-address"
                                                 autoComplete="email"
+                                                value={form.email}
+                                                onChange={e => setForm({ ...form, email: e.target.value })}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -62,6 +77,8 @@ export default function UserForm() {
                                                 name="tel"
                                                 id="tel"
                                                 autoComplete="tel"
+                                                value={form.phoneNumber}
+                                                onChange={e => setForm({ ...form, phoneNumber: e.target.value })}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -74,6 +91,7 @@ export default function UserForm() {
                                                 name="bday"
                                                 id="bday"
                                                 autoComplete="bday"
+                                                onChange={e => setForm({ ...form, birthday: e.target.value })}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -86,6 +104,8 @@ export default function UserForm() {
                                                 name="sex"
                                                 id="sex"
                                                 autoComplete="sex"
+                                                value={form.gender}
+                                                onChange={e => setForm({ ...form, gender: e.target.value })}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
