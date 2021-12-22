@@ -7,10 +7,40 @@ IngredientController.get('/:userId', async (req: Request, res: Response, next: N
     try {
         const { userId } = req.params;
 
-        // query for user
-        let result;
+        // create the ingredient
 
-        res.status(200).json(result);
+        var result;
+
+        var { ingredientID, ingredientName, aliasID } = req.body;
+
+        aliasID = parseInt(aliasID);
+
+        console.log(req.body);
+
+        var ingredientQuery = `SELECT * FROM Ingredients`;
+        ingredientQuery += ` WHERE ingredientName LIKE '%' `
+        // var values = [];
+
+        if(!(ingredientID === undefined)){
+            ingredientQuery+= ` AND ingredientID = `+ ingredientID + " ";
+        }
+        if(!(ingredientName === undefined)){
+            ingredientQuery+= ` AND ingredientName = "`+ ingredientName + `" `;
+        }
+        if(!(aliasID === undefined) && !(isNaN(aliasID))){
+            ingredientQuery+= ` AND aliasID = `+ aliasID + " ";
+        }
+
+        var returnRes;
+        db.query( ingredientQuery, function (err, rows, fields) {
+            if (err) {
+                console.log(err)
+            } else {
+                res.status(200).json(rows);
+            }
+        })
+        console.log(returnRes);
+        
     } catch (err) {
         console.error(err);
         next(err);

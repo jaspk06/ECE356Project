@@ -10,53 +10,161 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         // query for recipes
         let result;
 
-        const { ID, name, authorID, cookTime, ingredients, steps, date, description, tags } = req.body;
+        let { recipeID, name, authorID, cookTime, ingredients, steps, date, description, tags } = req.body;
         console.log(req.body);
+        
+        let ingredientFlag = false;
+        let tagFlag = false;
+        let ingredientCount = 1;
+        let tagCount = 1;
 
-        const query = `SELECT * FROM RECIPES`;
+        /////////////////////////////////
+        authorID = parseInt(authorID);
+        recipeID = parseInt(recipeID);
 
-        // var values = [ID, title, time];
+        let query = "with RecipeQuery as "
+        let recipeQuery = `( SELECT * FROM Recipe `;
+        recipeQuery += "WHERE recipeID LIKE '%'";
 
-        // if(! (Object.keys(req.body).length === 0)){
-        //     query += ` WHERE ingredients LIKE '%' `;
-        //     var ingredientQuery = "";
+        if(!(recipeID === undefined) && !(isNaN(recipeID)) ){
+            recipeQuery+= ` AND recipeID = `+ recipeID + " ";
+        }
+        if(!(authorID === undefined) && !(isNaN(authorID)) ){
+            recipeQuery+= ` AND authorID = `+ authorID + ` `;
+        }
+        if(!(name === undefined) ){
+            recipeQuery+= ` AND name LIKE "%`+ name + `%"`;
+        }
+        if(!(cookTime === undefined) ){
+            recipeQuery+= ` AND cookTime <= `+ cookTime + ` `;
+        }
 
+        recipeQuery += ") ";
 
-        //     for(let ingredient in ingredients){
-        //         ingredientQuery+= ` AND ingredients LIKE '%` +ingredients[ingredient]+`%' `;
-        //     }
-        //     query+= ingredientQuery;
-
-        //     if(!(ID === undefined)){
-        //         query+= ` AND ID = `+ ID + " ";
-        //     }
-        //     if(!(time === undefined)){
-        //         query+= ` AND time < `+ time + " ";
-        //     }
-        //     if(!(title === undefined)){
-        //         query+= ` AND title = '`+ title + "' ";
-        //     }
-
-        //     for(let value in values){
-        //         if(values[value] == "" ||  values[value] ===undefined || values[value]  == "NULL"){
-        //             values[value]  = "*";
-        //         }
-        //         console.log(" value: " + values[value] );
-        //     }
-        // }
+        query += recipeQuery;
+        ////////////////////////////
 
 
+
+        if(!(ingredients === undefined) ){
+
+            ingredientFlag = true;
+
+            let firstFlag = true;
+            
+            let ingredientsQuery= "";
+
+            for(const ingredient in ingredients){
+
+                ingredientsQuery += `, Ingredient`+ ingredientCount+` as ( WITH IngredientQuery AS (SELECT * FROM Ingredients `;
+                
+             
+    
+                
+                ingredientsQuery += "WHERE ";
+                ingredientsQuery += ` ingredientName LIKE '%` +ingredients[ingredient]+`%'), `;
+                ingredientsQuery += "RecipeWithIngredients as (select * from RecipeIngredients where ingredientID in (select ingredientID from IngredientQuery)) select distinct recipeID, name from  RecipeQuery inner join RecipeWithIngredients using(recipeID))"
+                
+
+      
+                ingredientCount+=1;
+            }
+
+
+            query += ingredientsQuery;
+
+        }
+        /////////////////////////////////
+
+        
+
+        /////////////////////////////////
+
+        if(!(tags === undefined) ){
+/////////////////////////////////
+
+
+            tagFlag = true;
+
+            let firstFlag = true;
+            
+            let tagQuery= "";
+
+            for(const tag in tags){
+
+                tagQuery += `, Tag`+ tagCount+` as ( WITH TagQuery AS (SELECT * FROM Tags `;
+                
+             
+    
+                
+                tagQuery += "WHERE ";
+                tagQuery += ` tag LIKE '%` +tags[tag]+`%'), `;
+                tagQuery += "RecipeWithTag as (select * from RecipeTags where tagID in (select tagID from TagQuery)) select distinct recipeID, name from  TagQuery inner join RecipeWithTag using(tagID) inner join Recipe using(recipeID))"
+                
+
+      
+                tagCount+=1;
+            }
+
+
+            query += tagQuery;
+
+
+/////////////////////////////////
+
+
+
+
+            // tagFlag = true;
+            // let firstFlag = true;
+
+            // let tagQuery = `, TagQuery as ( SELECT * FROM Tags `;
+            // tagQuery += "WHERE ";
+
+
+            // for(const tag in tags){
+            //     ingredientsQuery += `, Ingredient`+ ingredientCount+` as ( WITH IngredientQuery AS (SELECT * FROM Ingredients `;
+            //     if(firstFlag){
+            //         firstFlag = false;
+            //         tagQuery+= ` tag LIKE '%` +tags[tag]+`%' `;
+            //     } else {
+            //         tagQuery+= ` and tag LIKE '%` +tags[tag]+`%' `;
+            //     }
+            // }
+
+            // tagQuery += ")";
+
+            // query += tagQuery;
+            // const RecipeWithTag = ', RecipeWithTags as (select * from RecipeTags where tagID in (select tagID from TagQuery)) '
+            // query += RecipeWithTag;
+        }
+
+        /////////////////////////////
+        query += "select distinct recipeID, RecipeQuery.name from  RecipeQuery ";
+        if(ingredientFlag){
+            for(let i = 1; i < ingredientCount;i++){
+                query+= " inner join Ingredient"+(i)+" using(recipeID)";
+            }
+            
+        }
+        if(tagFlag){
+            for(let i = 1; i < tagCount;i++){
+                query+= " inner join Tag"+(i)+" using(recipeID)";
+            }
+        }
+
+               
         console.log(" query: " + query);
 
-        // db.query( query, values, function (err, rows, fields) {
-        //     if (err) {
-        //         console.log(err)
-        //     } else {
-        //         console.log(rows)
-        //     }
-        // })
+        db.query( query,  function (err, rows, fields) {
+            if (err) {
+                console.log(err)
+            } else {
+                console.log(rows)
+                res.status(200).json(rows);
+            }
+        })
 
-        res.status(200).json(result);
     } catch (err) {
         console.error(err);
 
