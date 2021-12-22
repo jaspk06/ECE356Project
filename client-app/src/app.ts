@@ -1,12 +1,14 @@
 import express, { Application } from 'express';
 import routes from './routes';
 import mysql from 'mysql2';
+import cors from 'cors';
 import * as dotenv from "dotenv";
 
 // Boot express
 const app: Application = express();
 
 app.use(express.json());
+app.use(cors())
 
 dotenv.config();
 
