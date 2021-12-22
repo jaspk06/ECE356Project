@@ -135,7 +135,7 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
             }
         }
 
-        query+= " inner join Reviews using(recipeID) where Rating >=" +Math.min(5, rating)
+        query+= " inner join Reviews using(recipeID) where Rating >=" +Math.min(5, rating)+ " order by Rating DESC"
                
         console.log(" query: " + query);
 
