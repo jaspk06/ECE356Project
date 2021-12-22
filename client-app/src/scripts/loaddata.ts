@@ -140,10 +140,12 @@ db.connect();
             const recipeRows: Array<number> = JSON.parse(JSON.stringify(await db.promise().query('SELECT authorID FROM Recipe WHERE authorID NOT IN (select userID from Users)')))[0].map((a: { authorID: number }) => a.authorID);
             const reviewRows: Array<number> = JSON.parse(JSON.stringify(await db.promise().query('SELECT userID FROM Reviews WHERE userID NOT IN (select userID from Users)')))[0].map((a: { userID: number }) => a.userID);
             const rows = Array.from(new Set(recipeRows.concat(reviewRows)));
+            console.log(rows)
             rows.forEach(row => {
                 users.push({ userId: row, firstName: faker.name.firstName(), lastName: faker.name.lastName(), email: faker.internet.email(), phoneNumber: faker.phone.phoneNumber(), gender: faker.name.gender(), birthday: faker.date.between(1950, new Date().getFullYear() - 12), dateJoined: faker.date.between(2000, new Date()) })
             })
             users.sort((a, b) => a.userId - b.userId);
+            users.shift(); //remove the users with id 0
             const csvUsers = parser.parse(users);
 
             console.log("Parsed objects. Writing to csv files...")
@@ -157,7 +159,7 @@ db.connect();
 
 (() => {
     console.log("loading recipes...")
-    let count = 0;
+    let count = 1;
     const recipes: Array<Recipe> = [];
     const tags: Array<Tag> = [];
     const recipeTags: Array<{ recipeId: number, tagId: number }> = [];
