@@ -1,8 +1,10 @@
 /* This example requires Tailwind CSS v2.0+ */
 import { Fragment, useState } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { BellIcon, MenuIcon, XIcon, SearchIcon, UserIcon, PlusIcon, CubeIcon } from '@heroicons/react/outline'
+import { SearchIcon, UserIcon, PlusIcon, CubeIcon } from '@heroicons/react/outline'
 import { Link } from 'react-router-dom'
+import axios from 'axios';
+import { baseURL } from '../utils';
 
 const user = {
     name: 'User',
@@ -19,7 +21,15 @@ function classNames(...classes: Array<string>) {
 export default function Navigation(props: any) {
     const id = localStorage.getItem("userId");
     const [userId, setUserId] = useState<string>(id ? id : "");
-    const [signedIn, setsignedIn] = useState(!!id);
+    const [signedIn, setSignedIn] = useState(!!id);
+
+    const signIn = (userId: string) => {
+        axios.get(`${baseURL}user/${userId}`).then(res => {
+            localStorage.setItem("userId", userId)
+            setSignedIn(res.data.length > 0);
+            setUserId("");
+        })
+    }
 
     return (
         <div className="min-h-full">
@@ -71,7 +81,7 @@ export default function Navigation(props: any) {
                                             />
                                             <button
                                                 type="button"
-                                                onClick={() => { localStorage.setItem("userId", userId); setsignedIn(true) }}
+                                                onClick={() => signIn(userId)}
                                                 className="px-4 border border-gray-300 shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500"
                                             >Login
                                             </button>
@@ -129,7 +139,7 @@ export default function Navigation(props: any) {
                                                         </Link>
                                                     ))}
                                                     <Link to={"/"}>
-                                                        <Menu.Item key={"sign-out"} onClick={() => { localStorage.removeItem("userId"); setsignedIn(false); }}>
+                                                        <Menu.Item key={"sign-out"} onClick={() => { localStorage.removeItem("userId"); setSignedIn(false); }}>
                                                             {({ active }) => (
                                                                 <p
                                                                     className={classNames(
