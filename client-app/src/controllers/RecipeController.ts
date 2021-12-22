@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express';
+import { maxHeaderSize } from 'http';
 import { db } from '../app';
 
 const RecipeController: Router = Router();
@@ -10,7 +11,7 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         // query for recipes
         let result;
 
-        let { recipeID, name, authorID, cookTime, ingredients, steps, date, description, tags } = req.body;
+        let { recipeID, name, authorID, cookTime, ingredients, steps, date, description, tags, rating } = req.body;
         console.log(req.body);
         
         let ingredientFlag = false;
@@ -21,6 +22,12 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         /////////////////////////////////
         authorID = parseInt(authorID);
         recipeID = parseInt(recipeID);
+        // rating = parseInt(rating);
+
+        // if((rating === undefined) || (isNaN(rating)) ){
+        //     rating = 5;
+        // }
+
 
         let query = "with RecipeQuery as "
         let recipeQuery = `( SELECT * FROM Recipe `;
@@ -128,7 +135,7 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
             }
         }
 
-        query+= " inner join Reviews using(recipeID)"
+        query+= " inner join Reviews using(recipeID) where Rating >=" +Math.min(5, rating)
                
         console.log(" query: " + query);
 
