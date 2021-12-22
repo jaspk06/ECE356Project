@@ -10,10 +10,10 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         // query for recipes
         let result;
 
-        var { ID, name, authorID, cookTime, ingredients, steps, date, description, tags } = req.body;
+        const { ID, name, authorID, cookTime, ingredients, steps, date, description, tags } = req.body;
         console.log(req.body);
 
-        let query = `SELECT * FROM RECIPES`;
+        const query = `SELECT * FROM RECIPES`;
 
         // var values = [ID, title, time];
 
@@ -21,12 +21,12 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         //     query += ` WHERE ingredients LIKE '%' `;
         //     var ingredientQuery = "";
 
-        
+
         //     for(let ingredient in ingredients){
         //         ingredientQuery+= ` AND ingredients LIKE '%` +ingredients[ingredient]+`%' `;
         //     }
         //     query+= ingredientQuery;
-            
+
         //     if(!(ID === undefined)){
         //         query+= ` AND ID = `+ ID + " ";
         //     }
@@ -45,7 +45,7 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         //     }
         // }
 
-        
+
         console.log(" query: " + query);
 
         // db.query( query, values, function (err, rows, fields) {
@@ -71,84 +71,79 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
 RecipeController.post('/:userId', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { userId } = req.params;
+        const date = new Date().toISOString().split('T')[0]
         // create the recipe
-
-        let result;
-
-        var { ID, name, authorID, cookTime, ingredients, steps, date, description, tags } = req.body;
-
-        ID = parseInt(ID);
+        const { name, cookTime, ingredients, steps, description, tags } = req.body;
 
         console.log(req.body);
 
-        let recipeInsert = `INSERT INTO recipes (ID, name, authorID, cookTime, date, description ) VALUES(?, ?, ?, ?, ?, ?)`;
+        const recipeInsert = `INSERT INTO Recipe (name, authorID, cookTime, date, description ) VALUES(?, ?, ?, ?, ?)`;
 
-        var values = [ID, name, authorID, cookTime, date, description];
+        let values = [name, userId, cookTime, date, description];
 
-        db.query( recipeInsert, values, function (err, rows, fields) {
-            if (err) {
-                console.log(err)
-            } else {
-                console.log(rows)
-            }
-        })
-        
+        const recipeID = JSON.parse(JSON.stringify(await db.promise().query(recipeInsert, values)))[0].insertId;
+
         console.log(" query: " + recipeInsert);
 
         // insert the ingredients
 
-        for(let ingredient in ingredients){
-            let ingredientInsert = `INSERT INTO RecipeIngredients (ID, ingredientID ) VALUES(?, ?)`;
+        for (const ingredient of ingredients) {
+            const getIngredients = `SELECT ingredientID, ingredientName FROM Ingredients WHERE ingredientName='${ingredient}'`
 
-            values = [ID, ingredients[ingredient]];
-            console.log(values);
-            db.query( ingredientInsert, values, function (err, rows, fields) {
-                if (err) {
-                    console.log(err)
-                } else {
-                    console.log(rows)
-                }
-            })
-            
+            const rows: Array<{ ingredientID: number, ingredientName: string }> = JSON.parse(JSON.stringify(await db.promise().query(getIngredients)))[0];
+
+            if (rows.length === 0) {
+                //create ingredient
+                const ingredientInsert = `INSERT INTO Ingredients (ingredientName) VALUES(?)`;
+                const ingredientID = JSON.parse(JSON.stringify(await db.promise().query(ingredientInsert, [ingredient])))[0].insertId;
+
+                const recipeIngredientInsert = `INSERT INTO RecipeIngredients (recipeID, ingredientID) VALUES(?,?)`;
+                JSON.parse(JSON.stringify(await db.promise().query(recipeIngredientInsert, [recipeID, ingredientID])))[0];
+            } else {
+                const recipeIngredientInsert = `INSERT INTO RecipeIngredients (recipeID, ingredientID) VALUES(?,?)`;
+                JSON.parse(JSON.stringify(await db.promise().query(recipeIngredientInsert, [recipeID, rows[0].ingredientID])));
+            }
         }
 
-        var stepCounter = 0 // steps
+        let stepCounter = 0 // steps
 
         // insert the steps
 
-        for(let step in steps){
-            let stepInsert = `INSERT INTO RecipeDirections (ID, step, des ) VALUES(?, ?, ?)`;
+        for (const step of steps) {
+            const stepInsert = `INSERT INTO RecipeDirections (recipeID, step, description ) VALUES(?, ?, ?)`;
 
-            values = [ID, stepCounter, steps[step]];
-            stepCounter+=1;
+            values = [recipeID, stepCounter, step];
+            stepCounter += 1;
 
             console.log(values);
-            db.query( stepInsert, values, function (err, rows, fields) {
+            db.query(stepInsert, values, function (err, rows, fields) {
                 if (err) {
-                    console.log(err)
+                    console.error(err)
                 } else {
                     console.log(rows)
                 }
             })
-            
+
         }
 
-        for(let tag in tags){
-            let tagInsert = `INSERT INTO RecipeTags (ID, tag ) VALUES(?, ?)`;
+        for (const tag of tags) {
+            const getTags = `SELECT * FROM Tags WHERE tag='${tag}'`
 
-            values = [ID, tags[tag]];
+            const rows: Array<{ tagID: number, tag: string }> = JSON.parse(JSON.stringify(await db.promise().query(getTags)))[0];
 
-            console.log(values);
-            db.query( tagInsert, values, function (err, rows, fields) {
-                if (err) {
-                    console.log(err)
-                } else {
-                    console.log(rows)
-                }
-            })
-            
+            if (rows.length === 0) {
+                //create tag
+                const tagInsert = `INSERT INTO Tags ( tag ) VALUES(?)`;
+                const tagID = JSON.parse(JSON.stringify(await db.promise().query(tagInsert, [tag])))[0].insertId;
+
+                const recipeTagInsert = `INSERT INTO RecipeTags ( recipeID, tagID ) VALUES(?,?)`;
+                JSON.parse(JSON.stringify(await db.promise().query(recipeTagInsert, [recipeID, tagID])));
+            } else {
+                const recipeTagInsert = `INSERT INTO RecipeTags ( recipeID, tagID ) VALUES(?,?)`;
+                JSON.parse(JSON.stringify(await db.promise().query(recipeTagInsert, [recipeID, rows[0].tagID])));
+            }
         }
-        
+
         res.status(200).json("success");
     } catch (err) {
         console.error(err);
