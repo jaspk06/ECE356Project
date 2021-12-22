@@ -22,11 +22,11 @@ RecipeController.get('/:userId', async (req: Request, res: Response, next: NextF
         /////////////////////////////////
         authorID = parseInt(authorID);
         recipeID = parseInt(recipeID);
-        // rating = parseInt(rating);
+        rating = parseInt(rating);
 
-        // if((rating === undefined) || (isNaN(rating)) ){
-        //     rating = 5;
-        // }
+        if((rating === undefined) || (isNaN(rating)) ){
+            rating = 0;
+        }
 
 
         let query = "with RecipeQuery as "
