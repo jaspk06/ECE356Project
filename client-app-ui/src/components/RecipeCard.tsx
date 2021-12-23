@@ -1,4 +1,3 @@
-import StarRating from "./StarRating";
 import { Link, useParams } from "react-router-dom";
 import { LeaveReview, Recipe, Review } from "../types/Recipe";
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +21,7 @@ export default function RecipeCard() {
         axios.get(`${baseURL}recipe/${recipeID}`).then(res => {
             const recipe: Recipe = res.data;
             recipe.recipeName = res.data.name;
+            recipe.nutrition.protein = res.data.nutrition.protien
             console.log(recipe);
             setRecipe(recipe);
         });
@@ -72,6 +72,7 @@ export default function RecipeCard() {
                         <Link to={`/users/${recipe.authorID}`}>
                             <p className="mt-1 max-w-2xl text-sm text-gray-500">{"Created by: " + recipe.authorName}</p>
                         </Link>
+                        <p className="mt-1 max-w-2xl text-sm text-gray-500">{new Date(recipe.date).toDateString()}</p>
                         <Rating precision={0.1} value={recipe.reviews.reduce((a, b) => a + (b.rating || 0), 0) / recipe.reviews.length} readOnly />
                         <p className="mt-1 max-w-2xl text-sm text-gray-500">{"Ready in: " + recipe.cookTime + " minutes"}</p>
                     </div>
@@ -83,7 +84,7 @@ export default function RecipeCard() {
                     </div>
                 </div>
 
-                <Modal />
+                <Modal nutrition={recipe.nutrition} />
                 <div className="bg-gray-50 border-t border-gray-200">
                     <dl>
                         <div className="lg:grid lg:grid-cols-2">

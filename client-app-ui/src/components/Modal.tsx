@@ -1,7 +1,11 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useState } from 'react'
+import { Nutrition } from '../types/Recipe'
 
-export default function Modal() {
+const base: Nutrition = { calories: 2000, totalFat: 80, saturatedFat: 20, sodium: 2300, sugar: 1, protein: 1 }
+
+export default function Modal(props: { nutrition: Nutrition }) {
+    const { nutrition } = props;
     let [isOpen, setIsOpen] = useState(false)
 
     function closeModal() {
@@ -39,8 +43,6 @@ export default function Modal() {
                         >
                             <Dialog.Overlay className="fixed inset-0" />
                         </Transition.Child>
-
-                        {/* This element is to trick the browser into centering the modal contents. */}
                         <span
                             className="inline-block h-screen align-middle"
                             aria-hidden="true"
@@ -67,36 +69,36 @@ export default function Modal() {
                                                     <div className="font-bold">Amount per serving</div>
                                                     <div className="text-4xl">Calories</div>
                                                 </div>
-                                                <div className="text-5xl">45</div>
+                                                <div className="text-5xl">{nutrition.calories * base.calories / 100}</div>
                                             </div>
                                             <div className="border-t-4 border-black text-sm pb-1">
                                                 <div className="text-right font-bold pt-1 pb-1">% Daily value*</div>
                                                 <hr className="border-gray-500" />
                                                 <div className="flex justify-between">
                                                     <div>
-                                                        <span className="font-bold">Total Fat</span> 8g
+                                                        <span className="font-bold">Total Fat</span> {nutrition.totalFat * base.totalFat / 100 + "g"}
                                                     </div>
-                                                    <div className="font-bold">10%</div>
+                                                    <div className="font-bold">{`${nutrition.totalFat}%`}</div>
                                                 </div>
                                                 <hr className="border-gray-500" />
                                                 <div className="flex justify-between">
-                                                    <div>Saturated Fat 1g</div>
-                                                    <div className="font-bold">5%</div>
+                                                    <div>{`Saturated Fat ${nutrition.saturatedFat * base.saturatedFat / 100}g`}</div>
+                                                    <div className="font-bold">{`${nutrition.saturatedFat}%`}</div>
                                                 </div>
                                                 <hr className="border-gray-500" />
                                                 <div className="flex justify-between">
                                                     <div>
-                                                        <span className="font-bold">Sodium</span> 160mg
+                                                        <span className="font-bold">Sodium</span> {`${nutrition.sodium * base.sodium / 100}mg`}
                                                     </div>
-                                                    <div className="font-bold">7%</div>
+                                                    <div className="font-bold">{`${nutrition.sodium}%`}</div>
                                                 </div>
                                                 <hr className="border-gray-500" />
                                                 <div className="pl-4">
-                                                    Total Sugar 12g
+                                                    {`Total Sugar ${nutrition.sodium}g`}
                                                 </div>
                                                 <hr className="border-gray-500" />
                                                 <div>
-                                                    <span className="font-bold">Protein</span> 3g
+                                                    <span className="font-bold">Protein</span> {`${nutrition.protein}g`}
                                                 </div>
                                             </div>
                                             <div className="border-t-4 border-black flex leading-none text-xs pt-2 pb-1">
