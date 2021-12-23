@@ -62,7 +62,7 @@ This is what your directory tree should look like:
 
   ## Loading Data
 In order to populate the database with the CSVs, they must be moved to inside the container of the MySQL instance. To achieve this, run the command 
-`sh copytodocker.sh`.
+`sh copytodocker.sh`. Then, enter the db container using `docker exec -it db bash`. You can then use the mysql CLI from there.
 
 After all the appropriate CSVs have been copied, they can be loaded. For our environment, we can use the command 
 
@@ -71,7 +71,7 @@ For example, loading ingredients would look like
 
     LOAD DATA LOCAL INFILE 'var/lib/mysql/PARSED_ingredients.csv' INTO TABLE Ingredients FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS (aliasID, ingredientName);
     
-Refer to [this guide](https://stackoverflow.com/a/60717467/13013612) to enable file loading in MySQL. After logging into the MySQL CLI with file loading enabled, run `createtables.sql`
+Refer to [this guide](https://stackoverflow.com/a/60717467/13013612) to enable file loading in MySQL. After logging into the MySQL CLI with file loading enabled, run `source var/lib/mysql/createtables.sql` in the mysql CLI.
 
 # Features
 
