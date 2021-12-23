@@ -227,7 +227,7 @@ ADD
 ALTER TABLE
   Reviews
 ADD
-  FOREIGN KEY (recipeID) REFERENCES Recipe (recipeID);
+  FOREIGN KEY (recipeID) REFERENCES Recipe (recipeID) ON DELETE CASCADE;
 ALTER TABLE
   Reviews
 ADD
@@ -235,11 +235,11 @@ ADD
 ALTER TABLE
   RecipeDirections
 ADD
-  FOREIGN KEY (recipeID) REFERENCES Recipe (recipeID);
+  FOREIGN KEY (recipeID) REFERENCES Recipe (recipeID) ON DELETE CASCADE;
 ALTER TABLE
   RecipeNutritionInformation
 ADD
-  FOREIGN KEY (recipeID) REFERENCES Recipe (recipeID);
+  FOREIGN KEY (recipeID) REFERENCES Recipe (recipeID) ON DELETE CASCADE;
 ALTER TABLE
   UserSavedRecipes
 ADD
