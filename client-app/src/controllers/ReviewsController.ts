@@ -49,7 +49,7 @@ ReviewsController.get('/user/:userID', async (req: Request, res: Response, next:
     try {
         const { userID } = req.params;
 
-        const query = `SELECT * FROM Reviews INNER JOIN Recipe ON Reviews.recipeID = Recipe.recipeID WHERE userID=${userID}`;
+        const query = `SELECT Reviews.*, Recipe.name FROM Reviews INNER JOIN Recipe ON Reviews.recipeID = Recipe.recipeID WHERE userID=${userID}`;
 
         const reviews = JSON.parse(JSON.stringify(await db.promise().query(query)));
 
