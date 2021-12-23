@@ -14,7 +14,7 @@ export default function UserCard(props: { userID: number }) {
     const ownerID = localStorage.getItem("userId");
 
     useEffect(() => {
-        axios.post(`${baseURL}recipe`, { authorID: userID }).then(res =>
+        axios.get(`${baseURL}recipe/user/${userID}`).then(res =>
             setRecipes(res.data)
         )
         axios.get(`${baseURL}reviews/user/${userID}`).then(res =>

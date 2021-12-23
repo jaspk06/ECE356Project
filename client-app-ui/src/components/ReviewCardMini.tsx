@@ -4,9 +4,8 @@ import { Rating } from "@mui/material";
 import axios from "axios";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Recipe, RecipeMini, Review } from "../types/Recipe";
+import { Review } from "../types/Recipe";
 import { baseURL } from "../utils";
-import StarRating from "./StarRating";
 
 export default function ReviewCardMini(props: Review) {
     const { rating, review, date, recipeID, recipeName, owner, userID } = props;

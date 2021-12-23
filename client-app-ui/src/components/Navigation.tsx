@@ -27,7 +27,6 @@ export default function Navigation(props: any) {
         axios.get(`${baseURL}user/${userId}`).then(res => {
             localStorage.setItem("userId", userId)
             setSignedIn(res.data.length > 0);
-            setUserId("");
         })
     }
 

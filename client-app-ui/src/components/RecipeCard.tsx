@@ -22,7 +22,6 @@ export default function RecipeCard() {
             const recipe: Recipe = res.data;
             recipe.recipeName = res.data.name;
             recipe.nutrition.protein = res.data.nutrition.protien
-            console.log(recipe);
             setRecipe(recipe);
         });
     }, [])

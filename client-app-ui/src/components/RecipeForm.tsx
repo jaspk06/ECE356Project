@@ -1,13 +1,18 @@
 import { MinusIcon } from "@heroicons/react/outline";
 import axios from "axios";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Recipe } from "../types/Recipe";
 import { baseURL } from "../utils";
 import Toast from "./Toast";
 const regexNumbers = /^[0-9\b]+$/;
 
-export default function Example() {
-    const [form, setForm] = useState({ recipeName: "", cookTime: 0, description: "", ingredients: [""], directions: [""], tags: [""], steps: [], nutrition: { calories: 0, saturatedFat: 0, totalFat: 0, sugar: 0, sodium: 0, protein: 0 } })
+export default function RecipeForm(props: { update?: boolean }) {
+    const { update } = props;
+    const { recipeID } = useParams<{ recipeID: string }>();
+    const navigate = useNavigate()
+
+    const [form, setForm] = useState({ recipeName: "", cookTime: 0, description: "", ingredients: [""], directions: [""], tags: [""], nutrition: { calories: 0, saturatedFat: 0, totalFat: 0, sugar: 0, sodium: 0, protein: 0 } })
     const [toast, setToast] = useState<{ open: boolean, message: string, severity: "success" | "error" }>({ open: false, message: "", severity: "success" });
 
     const userId = localStorage.getItem("userId");
@@ -17,15 +22,43 @@ export default function Example() {
         return temp;
     }
 
+    useEffect(() => {
+        if (update)
+            axios.get(`${baseURL}recipe/${recipeID}`).then(res => {
+                const temp = res.data;
+                temp.recipeName = res.data.name;
+                temp.nutrition.protein = res.data.nutrition.protien
+                console.log(temp)
+                setForm(temp);
+            }).catch(err => console.error(err));
+    }, [])
+
     const createRecipe = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setToast({ ...toast, open: false });
-        axios.post(`${baseURL}recipe/${userId}`, form).then(res => {
-            if (res.status === 201)
-                setToast({ severity: "success", open: true, message: "Successfully added recipe!" })
-            else
-                setToast({ severity: "error", open: true, message: res.data })
-        }).catch(err => setToast({ severity: "error", open: true, message: err.message }));
+        if (update) {
+            axios.put(`${baseURL}recipe/${recipeID}`, form).then(res => {
+                if (res.status === 200) {
+                    setToast({ severity: "success", open: true, message: "Successfully updated recipe!" })
+                    setTimeout(() => navigate(-1), 3000);
+                }
+                else
+                    setToast({ severity: "error", open: true, message: res.data })
+            }).catch(err => setToast({ severity: "error", open: true, message: err.message }));
+        } else {
+            axios.post(`${baseURL}recipe/${userId}`, form).then(res => {
+                if (res.status === 201){
+                    console.log(res.data)
+                    setToast({ severity: "success", open: true, message: "Successfully added recipe!" })
+                    setTimeout(() => navigate(-1), 3000);
+                    // navigate(`/recipes/${}`)
+                }
+                    
+                else
+                    setToast({ severity: "error", open: true, message: res.data })
+            }).catch(err => setToast({ severity: "error", open: true, message: err.message }));
+        }
+
     }
 
     return (
@@ -108,6 +141,7 @@ export default function Example() {
                                                         name={`ingredient-${i}`}
                                                         id={`ingredient-${i}`}
                                                         placeholder="Ingredient Name"
+                                                        value={form.ingredients[i]}
                                                         onChange={(e) => setForm({ ...form, ingredients: handleArray(form.ingredients, i, e.target.value) })}
                                                         required
                                                         className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
@@ -142,6 +176,7 @@ export default function Example() {
                                                         type="text"
                                                         name={`tag-${i}`}
                                                         id={`tag-${i}`}
+                                                        value={form.tags[i]}
                                                         placeholder={`Tag Name`}
                                                         onChange={(e) => setForm({ ...form, tags: handleArray(form.tags, i, e.target.value) })}
                                                         required
@@ -178,6 +213,7 @@ export default function Example() {
                                                         name={`direction-${i}`}
                                                         id={`direction-${i}`}
                                                         placeholder={`Step ${i + 1}`}
+                                                        value={form.directions[i]}
                                                         onChange={(e) => setForm({ ...form, directions: handleArray(form.directions, i, e.target.value) })}
                                                         required
                                                         className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"

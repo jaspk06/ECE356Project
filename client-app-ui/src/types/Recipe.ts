@@ -8,6 +8,7 @@ export interface Recipe {
     rating: number,
     description: string,
     directions: Array<string>,
+    tags: Array<string>,
     reviews: Array<Review>,
     nutrition: Nutrition,
     date: Date
