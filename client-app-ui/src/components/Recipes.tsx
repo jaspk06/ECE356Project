@@ -2,6 +2,7 @@ import LinearProgress from "@mui/material/LinearProgress"
 import TextField from "@mui/material/TextField"
 import axios from "axios"
 import { useEffect, useState } from "react"
+import InfiniteScroll from "react-infinite-scroll-component"
 import { RecipeMini } from "../types/Recipe"
 import { baseURL } from "../utils"
 import Filter from "./filter"
@@ -22,15 +23,30 @@ export default function Recipes() {
     const [filters, _setFilters] = useState<Filter>();
     const [loading, setLoading] = useState(true)
 
-    console.log(filters)
+
+    const fetchData = (reset?: boolean) => {
+        if (reset) {
+            setPage(0);
+            setLoading(true);
+            axios.post(`${baseURL}recipe`, { page: 0, ...filters }).then(res => {
+                console.log(res)
+                setRecipes(res.data);
+                setLoading(false);
+            })
+        }
+        else {
+            setPage(page + 1);
+            setLoading(true);
+            axios.post(`${baseURL}recipe`, { page, ...filters }).then(res => {
+                console.log(res)
+                setRecipes(recipes ? recipes.concat(res.data) : res.data);
+                setLoading(false);
+            })
+        }
+    }
 
     useEffect(() => {
-
-        axios.post(`${baseURL}recipe`, { page, ...filters }).then(res => {
-            setRecipes(res.data.map((recipe: any) => ({ ...recipe, rating: recipe.Rating })));
-            setLoading(false);
-        }
-        )
+        fetchData(true);
         axios.get(`${baseURL}tag`).then(res => setTags(res.data))
         axios.get(`${baseURL}ingredient`).then(res => setIngredients(res.data))
     }, [])
@@ -62,32 +78,31 @@ export default function Recipes() {
                     <Filter name="Tags" options={tags} onChange={setTagFilters} />
                     <Filter name="Ingredients" options={ingredients} onChange={setIngredientFilters} />
                     <TextField type="number" value={filters?.rating} onChange={(e) => _setFilters({ ...filters, rating: parseInt(e.target.value) })} variant="filled" label={"Minimum Rating"} />
-                    <TextField onSubmit={() => axios.post(`${baseURL}recipe`, { page, ...filters }).then(res =>
-                        setRecipes(res.data.map((recipe: any) => ({ ...recipe, rating: recipe.Rating })))
-                    )} type="number" value={filters?.cookTime} onChange={(e) => _setFilters({ ...filters, cookTime: parseInt(e.target.value) })} variant="filled" label={"Maximum Cook Time"} />
-                    <button disabled={loading} onClick={() => {
-                        setLoading(true)
-                        axios.post(`${baseURL}recipe`, { page, ...filters }).then(res => {
-                            setRecipes(res.data.map((recipe: any) => ({ ...recipe, rating: recipe.Rating })))
-                            setLoading(false)
-                        }
-                        )
-                    }
-                    } className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+                    <TextField type="number" value={filters?.cookTime} onChange={(e) => _setFilters({ ...filters, cookTime: parseInt(e.target.value) })} variant="filled" label={"Maximum Cook Time"} />
+                    <button disabled={loading} onClick={() => fetchData(true)} className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
                         Search
                     </button>
                 </div>
-                {loading && <LinearProgress />}
-                <div className="grid grid-cols-4 gap-4">
-                    {!loading && recipes && recipes.map(recipe => <RecipeCardMini
-                        recipeID={recipe.recipeID}
-                        name={recipe.name}
-                        cookTime={recipe.cookTime}
-                        firstName={recipe.firstName}
-                        lastName={recipe.lastName}
-                        rating={recipe.rating}
-                        description={recipe.description} />)}
-                </div>
+
+                {recipes && recipes.length > 0 && <InfiniteScroll
+                    dataLength={recipes.length} //This is important field to render the next data
+                    next={fetchData}
+                    hasMore={true}
+                    loader={<LinearProgress />}
+                    endMessage={<p style={{ textAlign: 'center' }}><b>Yay! You have seen it all</b></p>}>
+                    <div className="grid grid-cols-4 gap-4">
+                        {recipes.map(recipe => <RecipeCardMini
+                            recipeID={recipe.recipeID}
+                            name={recipe.name}
+                            cookTime={recipe.cookTime}
+                            firstName={recipe.firstName}
+                            lastName={recipe.lastName}
+                            rating={recipe.rating}
+                            description={recipe.description} />)}
+                    </div>
+                </InfiniteScroll>
+                }
+
             </div>
         </>
     )

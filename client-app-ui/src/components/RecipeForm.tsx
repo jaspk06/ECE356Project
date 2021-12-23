@@ -46,6 +46,8 @@ export default function Example() {
                                                 required
                                                 placeholder="Recipe Title"
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                                value={form.recipeName}
+                                                onChange={e => setForm({ ...form, recipeName: e.target.value })}
                                             />
                                         </div>
 
@@ -61,7 +63,8 @@ export default function Example() {
                                                     required
                                                     className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
                                                     placeholder="Description"
-                                                    defaultValue={''}
+                                                    value={form.description}
+                                                    onChange={e => setForm({ ...form, description: e.target.value })}
                                                 />
                                             </div>
                                         </div>

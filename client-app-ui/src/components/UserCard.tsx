@@ -1,3 +1,4 @@
+import { LinearProgress } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react"
 import { Recipe, RecipeMini, Review } from "../types/Recipe"
@@ -23,6 +24,7 @@ export default function UserCard(props: { userID: number }) {
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <h1 className="mb-4 text-3xl font-bold text-gray-900">Recipes</h1>
             <div className="grid grid-cols-4 gap-4">
+                {recipes && recipes.length === 0 && <p>No Recipes!</p>}
                 {recipes && recipes.map(recipe =>
                     <RecipeCardMini
                         recipeID={recipe.recipeID}
@@ -31,10 +33,12 @@ export default function UserCard(props: { userID: number }) {
                         rating={recipe.rating}
                         description={recipe.description}
                     />)}
+                {!recipes && <LinearProgress />}
             </div>
 
             <h1 className="my-4 text-3xl font-bold text-gray-900">Reviews</h1>
             <div className="grid grid-cols-4 gap-4">
+                {recipes && recipes.length === 0 && <p>No Reviews!</p>}
                 {reviews && reviews.map(review =>
                     <ReviewCardMini
                         recipeID={review.recipeID}
@@ -46,6 +50,7 @@ export default function UserCard(props: { userID: number }) {
                         lastName={review.lastName}
                         recipeName={review.recipeName}
                     />)}
+                {!reviews && <LinearProgress />}
             </div>
         </div>
     )

@@ -7,6 +7,7 @@ import Modal from "./Modal";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { baseURL } from "../utils";
+import { Rating } from "@mui/material";
 
 export default function RecipeCard() {
     const { recipeID } = useParams<{ recipeID: string }>();
@@ -45,7 +46,7 @@ export default function RecipeCard() {
                         <Link to={`/users/${recipe.authorID}`}>
                             <p className="mt-1 max-w-2xl text-sm text-gray-500">{"Created by: " + recipe.authorName}</p>
                         </Link>
-                        <StarRating stars={recipe.rating} />
+                        <Rating precision={0.1} value={recipe.reviews.reduce((a, b) => a + (b.rating || 0), 0) / recipe.reviews.length} readOnly />
                         <p className="mt-1 max-w-2xl text-sm text-gray-500">{"Ready in: " + recipe.cookTime + " minutes"}</p>
                     </div>
                     <div className="px-4 py-5 sm:px-6">
@@ -105,11 +106,10 @@ export default function RecipeCard() {
                                     <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
                                         {recipe.reviews.map((review: Review, i) => (
                                             <li className="bg-white pl-3 pr-4 py-3 flex items-center justify-between text-sm">
-
                                                 <div className="w-0 flex-1 flex items-center">
-
                                                     <span className="ml-2 flex-1 w-0">
-                                                        <StarRating stars={review.rating + 1} />
+                                                        <Rating precision={0.1} value={review.rating} readOnly />
+                                                        <br />
                                                         <Link to={`/users/${review.userID}`}>
                                                             {review.firstName} {review.lastName}
                                                         </Link>
@@ -120,7 +120,6 @@ export default function RecipeCard() {
                                                         {review.review}
                                                     </span>
                                                 </div>
-
                                             </li>
                                         ))}
                                     </ul>
