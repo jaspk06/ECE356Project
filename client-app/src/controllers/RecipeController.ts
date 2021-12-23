@@ -10,7 +10,7 @@ RecipeController.post('/', async (req: Request, res: Response, next: NextFunctio
     try {
         // query for recipes
         let { recipeID, name, authorID, cookTime, ingredients, steps, date, description, tags, rating, page } = req.body;
-        
+
         let ingredientFlag = false;
         let tagFlag = false;
         let ingredientCount = 1;
@@ -21,7 +21,7 @@ RecipeController.post('/', async (req: Request, res: Response, next: NextFunctio
         recipeID = parseInt(recipeID);
         rating = parseInt(rating);
 
-        if((rating === undefined) || (isNaN(rating)) ){
+        if ((rating === undefined) || (isNaN(rating))) {
             rating = 0;
         }
         if ((page === undefined) || (isNaN(page))) {
@@ -33,17 +33,17 @@ RecipeController.post('/', async (req: Request, res: Response, next: NextFunctio
         let recipeQuery = `( SELECT * FROM Recipe `;
         recipeQuery += "WHERE recipeID LIKE '%'";
 
-        if(recipeID && !(isNaN(recipeID)) ){
-            recipeQuery+= ` AND recipeID = `+ recipeID + " ";
+        if (recipeID && !(isNaN(recipeID))) {
+            recipeQuery += ` AND recipeID = ` + recipeID + " ";
         }
-        if(authorID && !(isNaN(authorID)) ){
-            recipeQuery+= ` AND authorID = `+ authorID + ` `;
+        if (authorID && !(isNaN(authorID))) {
+            recipeQuery += ` AND authorID = ` + authorID + ` `;
         }
-        if(name ){
-            recipeQuery+= ` AND name LIKE "%`+ name + `%"`;
+        if (name) {
+            recipeQuery += ` AND name LIKE "%` + name + `%"`;
         }
-        if(cookTime){
-            recipeQuery+= ` AND cookTime <= `+ cookTime + ` `;
+        if (cookTime) {
+            recipeQuery += ` AND cookTime <= ` + cookTime + ` `;
         }
 
         recipeQuery += ") ";
@@ -53,26 +53,26 @@ RecipeController.post('/', async (req: Request, res: Response, next: NextFunctio
 
 
 
-        if(!(ingredients === undefined) ){
+        if (!(ingredients === undefined)) {
 
             ingredientFlag = true;
 
-            let ingredientsQuery= "";
+            let ingredientsQuery = "";
 
-            for(const ingredient in ingredients){
+            for (const ingredient in ingredients) {
 
-                ingredientsQuery += `, Ingredient`+ ingredientCount+` as ( WITH IngredientQuery AS (SELECT * FROM Ingredients `;
-                
-             
-    
-                
+                ingredientsQuery += `, Ingredient` + ingredientCount + ` as ( WITH IngredientQuery AS (SELECT * FROM Ingredients `;
+
+
+
+
                 ingredientsQuery += "WHERE ";
-                ingredientsQuery += ` ingredientName LIKE '%` +ingredients[ingredient]+`%'), `;
+                ingredientsQuery += ` ingredientName LIKE '%` + ingredients[ingredient] + `%'), `;
                 ingredientsQuery += "RecipeWithIngredients as (select * from RecipeIngredients where ingredientID in (select ingredientID from IngredientQuery)) select distinct recipeID, name from  RecipeQuery inner join RecipeWithIngredients using(recipeID))"
-                
 
-      
-                ingredientCount+=1;
+
+
+                ingredientCount += 1;
             }
 
 
@@ -81,32 +81,32 @@ RecipeController.post('/', async (req: Request, res: Response, next: NextFunctio
         }
         /////////////////////////////////
 
-        
+
 
         /////////////////////////////////
 
-        if(!(tags === undefined) ){
-/////////////////////////////////
+        if (!(tags === undefined)) {
+            /////////////////////////////////
 
 
             tagFlag = true;
-            
-            let tagQuery= "";
 
-            for(const tag in tags){
+            let tagQuery = "";
 
-                tagQuery += `, Tag`+ tagCount+` as ( WITH TagQuery AS (SELECT * FROM Tags `;
-                
-             
-    
-                
+            for (const tag in tags) {
+
+                tagQuery += `, Tag` + tagCount + ` as ( WITH TagQuery AS (SELECT * FROM Tags `;
+
+
+
+
                 tagQuery += "WHERE ";
-                tagQuery += ` tag LIKE '%` +tags[tag]+`%'), `;
+                tagQuery += ` tag LIKE '%` + tags[tag] + `%'), `;
                 tagQuery += "RecipeWithTag as (select * from RecipeTags where tagID in (select tagID from TagQuery)) select distinct recipeID, name from  TagQuery inner join RecipeWithTag using(tagID) inner join Recipe using(recipeID))"
-                
 
-      
-                tagCount+=1;
+
+
+                tagCount += 1;
             }
 
 
@@ -116,30 +116,30 @@ RecipeController.post('/', async (req: Request, res: Response, next: NextFunctio
         /////////////////////////////
         // ratings
 
-        query+= ", Reviews AS (Select recipeID, avg(rating) as Rating from Reviews where recipeID in (select recipeID from RecipeQuery) GROUP BY recipeID)"
+        query += ", Reviews AS (Select recipeID, avg(rating) as Rating from Reviews where recipeID in (select recipeID from RecipeQuery) GROUP BY recipeID)"
         /////////////////////////////
         query += "SELECT DISTINCT recipeID, RecipeQuery.name, firstName, lastName, cookTIme, date, description, rating from  RecipeQuery ";
-        if(ingredientFlag){
-            for(let i = 1; i < ingredientCount;i++){
-                query+= " inner join Ingredient"+(i)+" using(recipeID)";
+        if (ingredientFlag) {
+            for (let i = 1; i < ingredientCount; i++) {
+                query += " inner join Ingredient" + (i) + " using(recipeID)";
             }
-            
+
         }
-        if(tagFlag){
-            for(let i = 1; i < tagCount;i++){
-                query+= " inner join Tag"+(i)+" using(recipeID)";
+        if (tagFlag) {
+            for (let i = 1; i < tagCount; i++) {
+                query += " inner join Tag" + (i) + " using(recipeID)";
             }
         }
 
         query += "INNER JOIN Users on Users.userID = RecipeQuery.authorID";
-        query+= " inner join Reviews using(recipeID) where Rating >=" +Math.min(5, rating)+ " order by Rating DESC"
+        query += " inner join Reviews using(recipeID) where Rating >=" + Math.min(5, rating) + " order by Rating DESC"
 
         query += ` LIMIT 32 OFFSET ${page}`
 
-               
+
         console.log(" query: " + query);
 
-        db.query( query,  function (err, rows, fields) {
+        db.query(query, function (err, rows, fields) {
             if (err) {
                 console.log(err)
             } else {
@@ -155,9 +155,9 @@ RecipeController.post('/', async (req: Request, res: Response, next: NextFunctio
 });
 
 
-RecipeController.get('/:recipeID', async (req: Request, res: Response, next: NextFunction) => {
+RecipeController.get('/:recipeID/:userID?', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { recipeID } = req.params;
+        const { recipeID, userID } = req.params;
 
         const recipeQuery = `SELECT * FROM Recipe WHERE recipeID=${recipeID}`;
         const ret = JSON.parse(JSON.stringify(await db.promise().query(recipeQuery)))[0];
@@ -185,6 +185,11 @@ RecipeController.get('/:recipeID', async (req: Request, res: Response, next: Nex
 
         const nutritionQuery = `SELECT * FROM RecipeNutritionInformation WHERE recipeID=${recipeID}`;
         recipe.nutrition = JSON.parse(JSON.stringify(await db.promise().query(nutritionQuery)))[0][0];
+
+        if (userID) {
+            const savedQuery = `SELECT * FROM UserSavedRecipes WHERE userID=${userID}`;
+            recipe.saved = JSON.parse(JSON.stringify(await db.promise().query(savedQuery)))[0].length > 0;
+        }
 
         res.status(200).json(recipe);
     } catch (error) {
@@ -398,6 +403,49 @@ RecipeController.delete('/:recipeID', async (req: Request, res: Response, next: 
         })
     } catch (err) {
         console.error(err);
+    }
+});
+
+// save recipe
+RecipeController.post('/save/:userID/:recipeID', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { userID, recipeID } = req.params;
+        console.log('saving')
+
+        const userFollow = `INSERT INTO UserSavedRecipes (userID, recipeID ) VALUES(?, ?)`;
+
+        db.query(userFollow, [userID, recipeID], function (err, rows, fields) {
+            if (err) {
+                console.error(err)
+                res.status(500).json(err);
+            } else {
+                res.status(200).send("success");
+            }
+        })
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+});
+
+// unsave recipe
+RecipeController.delete('/save/:userID/:recipeID', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { userID, recipeID } = req.params;
+
+        const userUnFollow = `DELETE FROM UserSavedRecipes WHERE userID=${userID} AND recipeID=${recipeID}`;
+
+        db.query(userUnFollow, [userID, recipeID], function (err, rows, fields) {
+            if (err) {
+                console.error(err)
+                res.status(500).json(err);
+            } else {
+                res.status(200).send("success");
+            }
+        })
+    } catch (err) {
+        console.error(err);
+        next(err);
     }
 });
 

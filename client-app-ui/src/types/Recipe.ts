@@ -11,7 +11,8 @@ export interface Recipe {
     tags: Array<string>,
     reviews: Array<Review>,
     nutrition: Nutrition,
-    date: Date
+    date: Date,
+    saved?: boolean
 }
 export interface RecipeMini {
     recipeID: number,
