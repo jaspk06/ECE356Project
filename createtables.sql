@@ -256,3 +256,7 @@ ALTER TABLE
   UserFollowing
 ADD
   FOREIGN KEY (followingUserID) REFERENCES Users (userID);
+
+CREATE INDEX recipeIdx ON Recipe(name, cookTime, rating);
+CREATE INDEX reviewIdx ON Reviews(rating, date);
+CREATE INDEX userIdx ON Users(firstName, lastName);
