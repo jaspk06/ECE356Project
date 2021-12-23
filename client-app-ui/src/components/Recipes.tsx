@@ -86,7 +86,7 @@ export default function Recipes() {
                     dataLength={recipes.length} //This is important field to render the next data
                     next={fetchData}
                     hasMore={true}
-                    loader={<LinearProgress />}
+                    loader={<></>}
                     endMessage={<p style={{ textAlign: 'center' }}><b>Yay! You have seen it all</b></p>}>
                     <div className="grid grid-cols-4 gap-4">
                         {recipes.map(recipe => <RecipeCardMini
