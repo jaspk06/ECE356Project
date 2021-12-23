@@ -50,6 +50,46 @@ UserController.post('/', async (req: Request, res: Response, next: NextFunction)
     }
 });
 
+// Follow another user
+UserController.post('/follow/', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { userID, followingUserID } = req.body;
+
+        const userFollow = `INSERT INTO UserFollowing (userID, followingUserID ) VALUES(?, ?)`;
+
+        db.query(userFollow, [userID, followingUserID], function (err, rows, fields) {
+            if (err) {
+                res.status(500).json(err);
+            } else {
+                res.status(200).send("success");
+            }
+        })
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+});
+
+// unfollow
+UserController.delete('/follow/', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { userID, followingUserID } = req.body;
+
+        const userUnFollow = `DELETE FROM UserFollowing WHERE userID=${userID} AND followingUserID=${followingUserID}`;
+
+        db.query(userUnFollow, [userID, followingUserID], function (err, rows, fields) {
+            if (err) {
+                res.status(500).json(err);
+            } else {
+                res.status(200).send("success");
+            }
+        })
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+});
+
 // edit a user
 UserController.put('/:userID', async (req: Request, res: Response, next: NextFunction) => {
     try {
