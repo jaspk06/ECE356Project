@@ -2,11 +2,38 @@ import {
     CalendarIcon,
     PencilIcon,
 } from '@heroicons/react/solid'
+import axios from 'axios';
+import { useState } from 'react';
 import { UserDisplay } from '../types/UserDisplay'
+import { baseURL } from '../utils';
 
 export default function Heading(props: UserDisplay) {
-    const { firstName, lastName, dateJoined, userID, setEditMode } = props;
+    const { firstName, lastName, dateJoined, userID, setEditMode, following } = props;
     const localID = localStorage.getItem("userId")
+    const [isFollowing, setIsFollowing] = useState(following)
+
+    const followUser = () => {
+        if (localID && parseInt(localID) !== userID) {
+            setIsFollowing(true);
+            axios.post(`${baseURL}user/follow/${localID}/${userID}`).then(res => {
+                if (res.status !== 200) setIsFollowing(false)
+
+
+            }).catch(() => setIsFollowing(false))
+        }
+
+    }
+
+    const unFollowUser = () => {
+        if (localID && parseInt(localID) !== userID) {
+            setIsFollowing(false)
+            axios.delete(`${baseURL}user/follow/${localID}/${userID}`).then(res => {
+                if (res.status !== 200) setIsFollowing(true)
+
+
+            }).catch(() => setIsFollowing(true))
+        }
+    }
 
     return (
         <header className="bg-white shadow">
@@ -30,7 +57,25 @@ export default function Heading(props: UserDisplay) {
                     <div className="mt-2 flex items-center text-sm text-gray-500">
                         <CalendarIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
                         {`Joined on ${new Date(dateJoined).toDateString()}`}
+
+
                     </div>
+                    <br />
+                    {localID && parseInt(localID) !== userID && !isFollowing &&
+                        <button
+                            onClick={() => followUser()}
+                            type="button"
+                            className="mt-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Follow
+                        </button>}
+                    {localID && parseInt(localID) !== userID && isFollowing && <button
+                        onClick={() => unFollowUser()}
+                        type="button"
+                        className="mt-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+                    >
+                        Unfollow
+                    </button>}
                 </div>
             </div>
         </header >

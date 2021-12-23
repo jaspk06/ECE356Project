@@ -18,7 +18,7 @@ export default function RecipeCard() {
     const [review, setReview] = useState<LeaveReview>({ rating: 0, review: '' })
 
     useEffect(() => {
-        axios.get(`${baseURL}recipe/${recipeID}/${userID}`).then(res => {
+        axios.get(`${baseURL}recipe/single/${recipeID}/${userID}`).then(res => {
             const recipe: Recipe = res.data;
             recipe.recipeName = res.data.name;
             recipe.nutrition.protein = res.data.nutrition.protien

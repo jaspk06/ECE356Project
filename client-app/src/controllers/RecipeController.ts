@@ -155,7 +155,7 @@ RecipeController.post('/', async (req: Request, res: Response, next: NextFunctio
 });
 
 
-RecipeController.get('/:recipeID/:userID?', async (req: Request, res: Response, next: NextFunction) => {
+RecipeController.get('/single/:recipeID/:userID?', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { recipeID, userID } = req.params;
 

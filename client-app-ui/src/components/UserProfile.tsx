@@ -16,8 +16,10 @@ export default function UserProfile() {
     const [user, setUser] = useState<User>()
     const [editMode, setEditMode] = useState(false);
 
+    const localID = localStorage.getItem('userId');
+
     useEffect(() => {
-        axios.get(`${baseURL}user/${userID}`).then(res => {
+        axios.get(`${baseURL}user/${userID}/${localID}`).then(res => {
             console.log(res.data)
             setUser(res.data[0]);
         })
@@ -31,7 +33,7 @@ export default function UserProfile() {
         <>
             {user &&
                 <>
-                    {!editMode && <> <Heading setEditMode={toggleEditMode} firstName={user.firstName} lastName={user.lastName} dateJoined={user.dateJoined} userID={user.userID} />
+                    {!editMode && <> <Heading setEditMode={toggleEditMode} following={user.following} firstName={user.firstName} lastName={user.lastName} dateJoined={user.dateJoined} userID={user.userID} />
                         <UserCard userID={user.userID} /> </>}
                     {editMode && <UserForm user={user} />}
                 </>}

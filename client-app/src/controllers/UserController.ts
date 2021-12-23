@@ -4,18 +4,19 @@ import { db } from '../app';
 
 const UserController: Router = Router();
 
-UserController.get('/:userID', async (req: Request, res: Response, next: NextFunction) => {
+UserController.get('/:userID/:localID?', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userID = parseInt(req.params.userID);
+        const localID = parseInt(req.params.localID);
 
         const userQuery = `SELECT * FROM Users WHERE userID = ${userID}`;
-        db.query(userQuery, function (err, rows, fields) {
-            if (err) {
-                res.json(500).json(err);
-            } else {
-                res.status(200).json(rows);
-            }
-        })
+        const user = JSON.parse(JSON.stringify(await db.promise().query(userQuery)))[0];
+
+        if (localID) {
+            const query = `SELECT * FROM UserFollowing WHERE userID=${localID} AND followingUserID=${userID}`
+            user[0].following = JSON.parse(JSON.stringify(await db.promise().query(query)))[0].length > 0;
+        }
+        res.status(200).json(user);
     } catch (err) {
         console.error(err);
         next(err);
@@ -51,14 +52,15 @@ UserController.post('/', async (req: Request, res: Response, next: NextFunction)
 });
 
 // Follow another user
-UserController.post('/follow/', async (req: Request, res: Response, next: NextFunction) => {
+UserController.post('/follow/:userID/:followingUserID', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { userID, followingUserID } = req.body;
+        const { userID, followingUserID } = req.params;
 
         const userFollow = `INSERT INTO UserFollowing (userID, followingUserID ) VALUES(?, ?)`;
 
         db.query(userFollow, [userID, followingUserID], function (err, rows, fields) {
             if (err) {
+                console.error(err)
                 res.status(500).json(err);
             } else {
                 res.status(200).send("success");
@@ -71,9 +73,9 @@ UserController.post('/follow/', async (req: Request, res: Response, next: NextFu
 });
 
 // unfollow
-UserController.delete('/follow/', async (req: Request, res: Response, next: NextFunction) => {
+UserController.delete('/follow/:userID/:followingUserID', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { userID, followingUserID } = req.body;
+        const { userID, followingUserID } = req.params;
 
         const userUnFollow = `DELETE FROM UserFollowing WHERE userID=${userID} AND followingUserID=${followingUserID}`;
 

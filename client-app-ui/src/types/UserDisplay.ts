@@ -3,5 +3,6 @@ export interface UserDisplay {
     lastName: string,
     dateJoined: Date,
     userID: number,
-    setEditMode: Function
+    setEditMode: Function,
+    following: boolean
 }

@@ -6,5 +6,6 @@ export interface User {
     phoneNumber: string,
     gender: string,
     birthday: string,
-    dateJoined: Date
+    dateJoined: Date,
+    following: boolean
 }
