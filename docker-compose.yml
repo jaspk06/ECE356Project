@@ -38,7 +38,6 @@ services:
             - ./client-app/data:/usr/src/app/data
             - ./client-app/src:/usr/src/app/src
             - ./client-app/nodemon.json:/usr/src/app/nodemon.json
-        command: dev
 
     client-app-ui:
         build:
@@ -56,8 +55,6 @@ services:
         volumes:
             - ./client-app-ui/build:/usr/src/app/build
             - ./client-app-ui/src:/usr/src/app/src
-        stdin_open: true
-        tty: true
 
 volumes:
     db: 

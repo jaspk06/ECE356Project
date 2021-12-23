@@ -16,4 +16,4 @@ COPY . .
 
 EXPOSE 3000
 # RUN depending on environment
-CMD ["yarn", "start"]
+CMD ["yarn", "prod"]

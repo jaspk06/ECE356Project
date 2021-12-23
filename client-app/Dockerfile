@@ -15,4 +15,4 @@ COPY . .
 
 EXPOSE 8080
 # RUN depending on environment
-ENTRYPOINT ["yarn"]
+CMD ["yarn", "prod"]
