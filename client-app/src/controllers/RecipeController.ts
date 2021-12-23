@@ -189,6 +189,77 @@ RecipeController.get('/:recipeID', async (req: Request, res: Response, next: Nex
     }
 });
 
+// creating a recipe - add authentication later
+RecipeController.put('/:recipeId', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { recipeId } = req.params;
+        // create the recipe
+        const { recipeName, cookTime, ingredients, directions, description, tags } = req.body;
+
+        const recipeUpdate = `UPDATE Recipe SET name='${recipeName}', cookTime'${cookTime}', description='${description}' WHERE recipeID=${recipeId}`;
+        const recipeID = JSON.parse(JSON.stringify(await db.promise().query(recipeUpdate)))[0];
+
+        const deleteRecipeIngredients = `DELETE FROM RecipeIngredients WHERE recipeId=${recipeId}`
+        await db.promise().query(deleteRecipeIngredients);
+        // insert the ingredients
+        for (const ingredient of ingredients) {
+            const getIngredients = `SELECT ingredientID, ingredientName FROM Ingredients WHERE ingredientName='${ingredient}'`
+
+            const rows: Array<{ ingredientID: number, ingredientName: string }> = JSON.parse(JSON.stringify(await db.promise().query(getIngredients)))[0];
+
+            if (rows.length === 0) {
+                //create ingredient
+                const ingredientInsert = `INSERT INTO Ingredients (ingredientName) VALUES(?)`;
+                const ingredientID = JSON.parse(JSON.stringify(await db.promise().query(ingredientInsert, [ingredient])))[0].insertId;
+
+                const recipeIngredientInsert = `INSERT INTO RecipeIngredients (recipeID, ingredientID) VALUES(?,?)`;
+                JSON.parse(JSON.stringify(await db.promise().query(recipeIngredientInsert, [recipeID, ingredientID])))[0];
+            } else {
+                const recipeIngredientInsert = `INSERT INTO RecipeIngredients (recipeID, ingredientID) VALUES(?,?)`;
+                JSON.parse(JSON.stringify(await db.promise().query(recipeIngredientInsert, [recipeID, rows[0].ingredientID])));
+            }
+        }
+
+        const deleteRecipeDirections = `DELETE FROM RecipeDirections WHERE recipeId=${recipeId}`
+        await db.promise().query(deleteRecipeDirections);
+        const stepInsert = `INSERT INTO RecipeDirections (recipeID, step, description ) VALUES(?, ?, ?)`;
+        // insert the directions
+        directions.forEach((step: string, i: number) => {
+            db.query(stepInsert, [recipeID, i, step], function (err, rows, fields) {
+                if (err) {
+                    res.status(500).json(err);
+                } else {
+                    console.log(rows)
+                }
+            })
+        })
+
+        const deleteRecipeTags = `DELETE FROM RecipeTags WHERE recipeId=${recipeId}`
+        await db.promise().query(deleteRecipeTags);
+        for (const tag of tags) {
+            const getTags = `SELECT * FROM Tags WHERE tag='${tag}'`
+
+            const rows: Array<{ tagID: number, tag: string }> = JSON.parse(JSON.stringify(await db.promise().query(getTags)))[0];
+
+            if (rows.length === 0) {
+                //create tag
+                const tagInsert = `INSERT INTO Tags ( tag ) VALUES(?)`;
+                const tagID = JSON.parse(JSON.stringify(await db.promise().query(tagInsert, [tag])))[0].insertId;
+
+                const recipeTagInsert = `INSERT INTO RecipeTags ( recipeID, tagID ) VALUES(?,?)`;
+                JSON.parse(JSON.stringify(await db.promise().query(recipeTagInsert, [recipeID, tagID])));
+            } else {
+                const recipeTagInsert = `INSERT INTO RecipeTags ( recipeID, tagID ) VALUES(?,?)`;
+                JSON.parse(JSON.stringify(await db.promise().query(recipeTagInsert, [recipeID, rows[0].tagID])));
+            }
+        }
+
+        res.status(200).json("success");
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+});
 
 // creating a recipe - add authentication later
 RecipeController.post('/:userId', async (req: Request, res: Response, next: NextFunction) => {
@@ -196,7 +267,7 @@ RecipeController.post('/:userId', async (req: Request, res: Response, next: Next
         const { userId } = req.params;
         const date = new Date().toISOString().split('T')[0]
         // create the recipe
-        const { recipeName, cookTime, ingredients, directions, description, tags } = req.body;
+        const { recipeName, cookTime, ingredients, directions, description, tags, nutrition } = req.body;
 
         const recipeInsert = `INSERT INTO Recipe (name, authorID, cookTime, date, description ) VALUES(?, ?, ?, ?, ?)`;
 
@@ -231,6 +302,15 @@ RecipeController.post('/:userId', async (req: Request, res: Response, next: Next
                     console.log(rows)
                 }
             })
+        })
+        const nutritionInsert = `INSERT INTO RecipeNutritionInformation (recipeID, calories, totalFat, sugar, sodium, protien, saturatedFat ) VALUES(?, ?, ?, ?, ?, ?, ?)`;
+        // insert the directions
+        db.query(nutritionInsert, [recipeID, nutrition.calories, nutrition.totalFat, nutrition.sugar, nutrition.sodium, nutrition.protein, nutrition.saturatedFat], function (err, rows, fields) {
+            if (err) {
+                res.status(500).json(err);
+            } else {
+                console.log(rows)
+            }
         })
 
         for (const tag of tags) {
