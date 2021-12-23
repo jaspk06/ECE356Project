@@ -83,6 +83,28 @@ ReviewsController.post('/:userId', async (req: Request, res: Response, next: Nex
     }
 });
 
+// editing a review
+ReviewsController.put('/', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { recipeID, userID, rating, review } = req.body; // date ends up being a datetime.now() 
+
+        const date = new Date().toISOString().split('T')[0];
+
+        const reviewUpdate = `UPDATE Reviews SET rating=${rating}, date='${date}', review='${review + " (Edited)"}' WHERE recipeID = ${recipeID} AND userID=${userID}`;
+
+        db.query(reviewUpdate, function (err, rows, fields) {
+            if (err) {
+                res.status(500).json(err);
+            } else {
+                res.status(200).json("success");
+            }
+        })
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+});
+
 ReviewsController.delete('/:recipeID/:userID', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { recipeID, userID } = req.params;

@@ -9,7 +9,8 @@ export interface Recipe {
     description: string,
     directions: Array<string>,
     reviews: Array<Review>,
-    nutrition: Object
+    nutrition: Nutrition,
+    date: Date
 }
 export interface RecipeMini {
     recipeID: number,
@@ -34,8 +35,8 @@ export interface Review {
     date: Date,
     review: string,
     userID: number,
-    firstName: string,
-    lastName: string,
+    firstName?: string,
+    lastName?: string,
     recipeID?: number,
     recipeName?: string,
     owner?: boolean
