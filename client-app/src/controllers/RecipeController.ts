@@ -267,4 +267,26 @@ RecipeController.post('/:userId', async (req: Request, res: Response, next: Next
     }
 });
 
+RecipeController.delete('/:recipeID', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { recipeID } = req.params;
+    
+        const recipeDelete = `DELETE FROM Recipe where recipeID = `+recipeID;
+        console.log(recipeDelete);
+        db.query(recipeDelete,  function (err, rows, fields) {
+            if (err) {
+                res.status(500).json(err);
+
+            } else {
+                console.log(rows)
+                res.status(200).json("success");
+            }
+        })
+
+        
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 export default RecipeController;

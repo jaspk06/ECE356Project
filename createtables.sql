@@ -207,7 +207,7 @@ ADD
 ALTER TABLE
   RecipeIngredients
 ADD
-  FOREIGN KEY (recipeID) REFERENCES Recipe (recipeID);
+  FOREIGN KEY (recipeID) REFERENCES Recipe (recipeID) ON DELETE CASCADE;
 ALTER TABLE
   RecipeIngredients
 ADD
@@ -215,7 +215,7 @@ ADD
 ALTER TABLE
   RecipeTags
 ADD
-  FOREIGN KEY (recipeID) REFERENCES Recipe (recipeID);
+  FOREIGN KEY (recipeID) REFERENCES Recipe (recipeID) ON DELETE CASCADE;
 ALTER TABLE
   RecipeTags
 ADD
