@@ -35,11 +35,9 @@ export default function Recipes() {
             setPage(0);
         }
         else {
-            setLoading(true);
             axios.post(`${baseURL}recipe`, { page: page + 1, ...filters }).then(res => {
                 console.log(res)
                 setRecipes(recipes ? recipes.concat(res.data) : res.data);
-                setLoading(false);
             })
             setPage(page + 1);
         }
@@ -83,8 +81,8 @@ export default function Recipes() {
                         Search
                     </button>
                 </div>
-
-                {recipes && recipes.length > 0 && <InfiniteScroll
+                {loading && <LinearProgress />}
+                {!loading && recipes && recipes.length > 0 && <InfiniteScroll
                     dataLength={recipes.length} //This is important field to render the next data
                     next={fetchData}
                     hasMore={true}
