@@ -25,13 +25,7 @@ To run the code locally, follow the steps below
 
 2.  `cd` into the project repository
 
-3. Run `docker-compose up -d` from the project root directory to run the development environment. This will create a mysql db container on `localhost:3306`, nodejs server container, and React UI on `localhost:3000`.
-
-4. Go into the client-app container by running `docker exec -it client-app bash`.
-
-5. Within the container, you can now run `yarn dev-load` to run the csv data insertion script or `yarn dev` to run the Express server on `localhost:8080`.
-
-  
+3. Run `docker-compose up -d` from the project root directory to run the environment. This will create a mysql db container on `localhost:3306`, nodejs server container on `localhost:8080`, and React UI on `localhost:3000` in production mode.
 
 ## If you are missing the CSV data files
 
@@ -77,7 +71,7 @@ For example, loading ingredients would look like
 
     LOAD DATA LOCAL INFILE 'var/lib/mysql/PARSED_ingredients.csv' INTO TABLE Ingredients FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS (aliasID, ingredientName);
     
-Refer to [this guide](https://stackoverflow.com/a/60717467/13013612) to enable file loading. After logging into the MySQL CLI with file loading enabled, run `createtables.sql`
+Refer to [this guide](https://stackoverflow.com/a/60717467/13013612) to enable file loading in MySQL. After logging into the MySQL CLI with file loading enabled, run `createtables.sql`
 
 # Features
 
