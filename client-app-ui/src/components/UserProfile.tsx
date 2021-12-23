@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { baseURL } from '../utils'
 import { User } from '../types/User'
+import UserForm from './UserForm'
 
 
 
@@ -13,6 +14,7 @@ import { User } from '../types/User'
 export default function UserProfile() {
     const { userID } = useParams<{ userID: string }>();
     const [user, setUser] = useState<User>()
+    const [editMode, setEditMode] = useState(false);
 
     useEffect(() => {
         axios.get(`${baseURL}user/${userID}`).then(res => {
@@ -21,13 +23,19 @@ export default function UserProfile() {
         })
     }, [])
 
+    function toggleEditMode() {
+        setEditMode(!editMode);
+    }
+
     return (
         <>
             {user &&
                 <>
-                    <Heading firstName={user.firstName} lastName={user.lastName} dateJoined={user.dateJoined} userID={user.userID} />
-                    <UserCard userID={user.userID}/>
+                    {!editMode && <> <Heading setEditMode={toggleEditMode} firstName={user.firstName} lastName={user.lastName} dateJoined={user.dateJoined} userID={user.userID} />
+                        <UserCard userID={user.userID} /> </>}
+                    {editMode && <UserForm user={user} />}
                 </>}
+
         </>
     )
 }

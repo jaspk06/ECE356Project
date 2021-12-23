@@ -1,20 +1,27 @@
 import axios from "axios";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { User } from "../types/User";
 import { baseURL } from "../utils";
 
-export default function UserForm() {
-    const [form, setForm] = useState({ firstName: "", lastName: "", email: "", phoneNumber: "", birthday: "", gender: "" })
+interface UserFormProps { user?: User }
+
+export default function UserForm(props: UserFormProps) {
+    const { user } = props
+    const [form, setForm] = useState(user ? { ...user, birthday: new Date(user.birthday).toISOString().split('T')[0] } : { firstName: "", lastName: "", email: "", phoneNumber: "", birthday: "", gender: "" })
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        axios.post(`${baseURL}user`, form).then(res => console.log(res));
+        if (user)
+            axios.put(`${baseURL}user/${user.userID}`, form).then(res => console.log(res));
+        else
+            axios.post(`${baseURL}user`, form).then(res => console.log(res));
     }
     return (
         <>
             <header className="bg-white shadow">
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Sign Up</h2>
+                    <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{user ? "Edit Profile" : "Sign Up"}</h2>
                 </div>
             </header>
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -91,6 +98,7 @@ export default function UserForm() {
                                                 name="bday"
                                                 id="bday"
                                                 autoComplete="bday"
+                                                value={form.birthday}
                                                 onChange={e => setForm({ ...form, birthday: e.target.value })}
                                                 className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                             />

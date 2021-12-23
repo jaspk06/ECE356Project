@@ -50,4 +50,33 @@ UserController.post('/', async (req: Request, res: Response, next: NextFunction)
     }
 });
 
+// edit a user
+UserController.put('/:userID', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { userID } = req.params;
+        const { firstName, lastName, email, phoneNumber, gender } = req.body;
+
+        const userInsert = `UPDATE Users SET firstName='${firstName}', lastName='${lastName}', email='${email}', phoneNumber='${phoneNumber}', gender='${gender}' WHERE userID=${userID}`;
+
+        const birthday = new Date(req.body.birthday).toISOString().split('T')[0];
+        const dateJoined = new Date().toISOString().split('T')[0];
+
+        if (!validateEmail(email)) res.status(400).send('Illegal email');
+
+        db.query(userInsert, [firstName, lastName, email, phoneNumber, gender, birthday, dateJoined], function (err, rows, fields) {
+            if (err) {
+                console.error(err)
+                res.status(500).json(err);
+            } else {
+                // @ts-ignore
+                res.status(200).send("Success");
+            }
+        })
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+});
+
+
 export default UserController;
