@@ -5,6 +5,6 @@ export interface User {
     email: string,
     phoneNumber: string,
     gender: string,
-    birthday: Date,
+    birthday: string,
     dateJoined: Date
 }

@@ -1,6 +1,6 @@
 import StarRating from "./StarRating";
 import { Link, useParams } from "react-router-dom";
-import { Recipe, Review } from "../types/Recipe";
+import { LeaveReview, Recipe, Review } from "../types/Recipe";
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeftIcon } from "@heroicons/react/outline";
 import Modal from "./Modal";
@@ -13,8 +13,10 @@ export default function RecipeCard() {
     const { recipeID } = useParams<{ recipeID: string }>();
     console.log(recipeID)
     const navigate = useNavigate();
+    const userID = localStorage.getItem("userId");
 
     const [recipe, setRecipe] = useState<Recipe>();
+    const [review, setReview] = useState<LeaveReview>({ rating: 0, review: '' })
 
     useEffect(() => {
         axios.get(`${baseURL}recipe/${recipeID}`).then(res => {
@@ -24,6 +26,16 @@ export default function RecipeCard() {
             setRecipe(recipe);
         });
     }, [])
+
+    const canLeaveReview = () => {
+        console.log(userID)
+        if (recipe && userID) {
+            if (recipe.authorID === parseInt(userID)) return false;
+            for (const review of recipe.reviews)
+                if (review.userID === parseInt(userID)) return false;
+        } else return false;
+        return true;
+    }
 
     return (
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -104,11 +116,34 @@ export default function RecipeCard() {
                                 <dt className="text-sm font-medium text-gray-500">Reviews</dt>
                                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                     <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
+                                        {canLeaveReview() && <li className="bg-white pl-3 pr-4 py-3 flex items-center justify-between text-sm">
+                                            <div className="w-0 flex-1 flex items-center">
+                                                <span className="ml-2 flex-1 w-0">
+                                                    <Rating value={review.rating} onChange={(e, value) => setReview({ ...review, rating: value })} />
+                                                    <textarea
+                                                        id="review"
+                                                        name="review"
+                                                        rows={2}
+                                                        required
+                                                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
+                                                        placeholder="Review"
+                                                        value={review.review}
+                                                        onChange={e => setReview({ ...review, review: e.target.value })}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="mt-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                    >
+                                                        Publish
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </li>}
                                         {recipe.reviews.map((review: Review, i) => (
                                             <li className="bg-white pl-3 pr-4 py-3 flex items-center justify-between text-sm">
                                                 <div className="w-0 flex-1 flex items-center">
                                                     <span className="ml-2 flex-1 w-0">
-                                                        <Rating precision={0.1} value={review.rating} readOnly />
+                                                        <Rating value={review.rating} readOnly />
                                                         <br />
                                                         <Link to={`/users/${review.userID}`}>
                                                             {review.firstName} {review.lastName}

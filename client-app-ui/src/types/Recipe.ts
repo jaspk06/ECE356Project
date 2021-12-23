@@ -18,7 +18,8 @@ export interface RecipeMini {
     firstName?: string,
     lastName?: string,
     rating: number,
-    description: string
+    description: string,
+    owner?: boolean
 }
 export interface Nutrition {
     calories: number,
@@ -36,5 +37,10 @@ export interface Review {
     firstName: string,
     lastName: string,
     recipeID?: number,
-    recipeName?: string
+    recipeName?: string,
+    owner?: boolean
+}
+export interface LeaveReview {
+    rating: number | null,
+    review: string
 }
