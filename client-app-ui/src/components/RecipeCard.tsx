@@ -37,6 +37,20 @@ export default function RecipeCard() {
         return true;
     }
 
+    const publishReview = () => {
+        if (review.rating && recipe && userID) {
+            const newReview: Review = { review: review.review, rating: review.rating, userID: parseInt(userID), firstName: 'Yourself', lastName: '', date: new Date() }
+            const tempReviews = [newReview].concat(recipe.reviews);
+            setRecipe({ ...recipe, reviews: tempReviews })
+            axios.post(`${baseURL}reviews/${userID}`, { recipeID: recipeID, userID: userID, rating: review.rating, review: review.review }).then(res => {
+                console.log(res.data);
+                if (res.status !== 201)
+                    setRecipe({ ...recipe, reviews: recipe.reviews.filter(review => review.userID !== parseInt(userID)) })
+            })
+        }
+
+    }
+
     return (
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             {recipe && <div className="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -131,6 +145,7 @@ export default function RecipeCard() {
                                                         onChange={e => setReview({ ...review, review: e.target.value })}
                                                     />
                                                     <button
+                                                        onClick={() => publishReview()}
                                                         type="button"
                                                         className="mt-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                                     >

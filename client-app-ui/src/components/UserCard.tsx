@@ -41,7 +41,7 @@ export default function UserCard(props: { userID: number }) {
 
             <h1 className="my-4 text-3xl font-bold text-gray-900">Reviews</h1>
             <div className="grid grid-cols-4 gap-4">
-                {recipes && recipes.length === 0 && <p>No Reviews!</p>}
+                {reviews && reviews.length === 0 && <p>No Reviews!</p>}
                 {reviews && reviews.map(review =>
                     <ReviewCardMini
                         recipeID={review.recipeID}
