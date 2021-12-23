@@ -92,5 +92,26 @@ ReviewsController.post('/:userId', async (req: Request, res: Response, next: Nex
     }
 });
 
+ReviewsController.delete('/:recipeID/:userID', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { recipeID, userID } = req.params;
+
+        const reviewDelete = `DELETE FROM Reviews where recipeID = `+recipeID + ` AND userID = `+userID;
+        console.log(reviewDelete);
+        db.query(reviewDelete,  function (err, rows, fields) {
+            if (err) {
+                res.status(500).json(err);
+
+            } else {
+                console.log(rows)
+                res.status(200).json("success");
+            }
+        })
+
+
+    } catch (err) {
+        console.error(err);
+    }
+});
 
 export default ReviewsController;
