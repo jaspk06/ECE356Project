@@ -35,7 +35,8 @@ To run the code locally, follow the steps below
 
 ## If you are missing the CSV data files
 
-[Download the parsed CSV files](https://drive.google.com/drive/folders/1D_Vd6cjL7tTgIL8spZp-c6kjpFtAEhtG?usp=sharing)
+1. [Download the parsed CSV files](https://drive.google.com/drive/folders/1D_Vd6cjL7tTgIL8spZp-c6kjpFtAEhtG?usp=sharing)
+2. Move the files to the directory `ECE356Project/client-app/data/*.csv`
 
 OR
 
