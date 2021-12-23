@@ -9,7 +9,6 @@ RecipeController.post('/', async (req: Request, res: Response, next: NextFunctio
     try {
         // query for recipes
         let { recipeID, name, authorID, cookTime, ingredients, steps, date, description, tags, rating, page } = req.body;
-        console.log(req.body);
         
         let ingredientFlag = false;
         let tagFlag = false;
@@ -143,15 +142,13 @@ RecipeController.post('/', async (req: Request, res: Response, next: NextFunctio
             if (err) {
                 console.log(err)
             } else {
-                console.log(rows)
+
                 res.status(200).json(rows);
             }
         })
 
     } catch (err) {
         console.error(err);
-
-
         next(err);
     }
 });

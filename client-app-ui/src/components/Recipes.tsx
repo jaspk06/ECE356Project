@@ -26,22 +26,22 @@ export default function Recipes() {
 
     const fetchData = (reset?: boolean) => {
         if (reset) {
-            setPage(0);
             setLoading(true);
             axios.post(`${baseURL}recipe`, { page: 0, ...filters }).then(res => {
                 console.log(res)
                 setRecipes(res.data);
                 setLoading(false);
             })
+            setPage(0);
         }
         else {
-            setPage(page + 1);
             setLoading(true);
-            axios.post(`${baseURL}recipe`, { page, ...filters }).then(res => {
+            axios.post(`${baseURL}recipe`, { page: page + 1, ...filters }).then(res => {
                 console.log(res)
                 setRecipes(recipes ? recipes.concat(res.data) : res.data);
                 setLoading(false);
             })
+            setPage(page + 1);
         }
     }
 
