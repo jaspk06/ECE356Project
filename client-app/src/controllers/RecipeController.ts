@@ -331,7 +331,7 @@ RecipeController.post('/:userId', async (req: Request, res: Response, next: Next
             }
         }
 
-        res.status(200).json("success");
+        res.status(201).json("success");
     } catch (err) {
         console.error(err);
         next(err);

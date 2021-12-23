@@ -3,22 +3,36 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { User } from "../types/User";
 import { baseURL } from "../utils";
+import Toast from "./Toast";
 
 interface UserFormProps { user?: User }
 
 export default function UserForm(props: UserFormProps) {
     const { user } = props
     const [form, setForm] = useState(user ? { ...user, birthday: new Date(user.birthday).toISOString().split('T')[0] } : { firstName: "", lastName: "", email: "", phoneNumber: "", birthday: "", gender: "" })
-
+    const [toast, setToast] = useState<{ open: boolean, message: string, severity: "success" | "error" }>({ open: false, message: "", severity: "success" });
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setToast({ ...toast, open: false });
         if (user)
-            axios.put(`${baseURL}user/${user.userID}`, form).then(res => console.log(res));
+            axios.put(`${baseURL}user/${user.userID}`, form).then(res => {
+                if (res.status === 200)
+                    setToast({ severity: "success", open: true, message: "Successfully updated user" })
+                else
+                    setToast({ severity: "error", open: true, message: res.data })
+            }).catch(err => setToast({ severity: "error", open: true, message: err.message }));
         else
-            axios.post(`${baseURL}user`, form).then(res => console.log(res));
+            axios.post(`${baseURL}user`, form).then(res => {
+                if (res.status === 201)
+                    setToast({ severity: "success", open: true, message: "Successfully signed up!" })
+                else
+                    setToast({ severity: "error", open: true, message: res.data })
+            }).catch(err => setToast({ severity: "error", open: true, message: err.message }));
+        ;
     }
     return (
         <>
+            <Toast open={toast.open} message={toast.message} severity={toast.severity} />
             <header className="bg-white shadow">
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{user ? "Edit Profile" : "Sign Up"}</h2>

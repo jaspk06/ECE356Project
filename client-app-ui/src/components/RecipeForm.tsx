@@ -3,10 +3,13 @@ import axios from "axios";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { baseURL } from "../utils";
+import Toast from "./Toast";
 const regexNumbers = /^[0-9\b]+$/;
 
 export default function Example() {
     const [form, setForm] = useState({ recipeName: "", cookTime: 0, description: "", ingredients: [""], directions: [""], tags: [""], steps: [], nutrition: { calories: 0, saturatedFat: 0, totalFat: 0, sugar: 0, sodium: 0, protein: 0 } })
+    const [toast, setToast] = useState<{ open: boolean, message: string, severity: "success" | "error" }>({ open: false, message: "", severity: "success" });
+
     const userId = localStorage.getItem("userId");
     const handleArray = (ingredients: Array<string>, index: number, value: string) => {
         const temp = ingredients;
@@ -16,11 +19,18 @@ export default function Example() {
 
     const createRecipe = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        axios.post(`${baseURL}recipe/${userId}`, form).then(res => console.log(res));
+        setToast({ ...toast, open: false });
+        axios.post(`${baseURL}recipe/${userId}`, form).then(res => {
+            if (res.status === 201)
+                setToast({ severity: "success", open: true, message: "Successfully added recipe!" })
+            else
+                setToast({ severity: "error", open: true, message: res.data })
+        }).catch(err => setToast({ severity: "error", open: true, message: err.message }));
     }
 
     return (
         <>
+            <Toast open={toast.open} message={toast.message} severity={toast.severity} />
             <header className="bg-white shadow">
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Add a Recipe</h2>
