@@ -27,7 +27,7 @@ RecipeController.post('/', async (req: Request, res: Response, next: NextFunctio
         if ((page === undefined) || (isNaN(page))) {
             page = 0;
         }
-        page = page * 16;
+        page = page * 32;
 
         let query = "with RecipeQuery as "
         let recipeQuery = `( SELECT * FROM Recipe `;
@@ -134,7 +134,7 @@ RecipeController.post('/', async (req: Request, res: Response, next: NextFunctio
         query += "INNER JOIN Users on Users.userID = RecipeQuery.authorID";
         query+= " inner join Reviews using(recipeID) where Rating >=" +Math.min(5, rating)+ " order by Rating DESC"
 
-        query += ` LIMIT 16 OFFSET ${page}`
+        query += ` LIMIT 32 OFFSET ${page}`
 
                
         console.log(" query: " + query);
@@ -199,11 +199,11 @@ RecipeController.post('/:userId', async (req: Request, res: Response, next: Next
         const { userId } = req.params;
         const date = new Date().toISOString().split('T')[0]
         // create the recipe
-        const { name, cookTime, ingredients, steps, description, tags } = req.body;
+        const { recipeName, cookTime, ingredients, directions, description, tags } = req.body;
 
         const recipeInsert = `INSERT INTO Recipe (name, authorID, cookTime, date, description ) VALUES(?, ?, ?, ?, ?)`;
 
-        const recipeID = JSON.parse(JSON.stringify(await db.promise().query(recipeInsert, [name, userId, cookTime, date, description])))[0].insertId;
+        const recipeID = JSON.parse(JSON.stringify(await db.promise().query(recipeInsert, [recipeName, userId, cookTime, date, description])))[0].insertId;
 
         // insert the ingredients
         for (const ingredient of ingredients) {
@@ -225,8 +225,8 @@ RecipeController.post('/:userId', async (req: Request, res: Response, next: Next
         }
 
         const stepInsert = `INSERT INTO RecipeDirections (recipeID, step, description ) VALUES(?, ?, ?)`;
-        // insert the steps
-        steps.forEach((step: string, i: number) => {
+        // insert the directions
+        directions.forEach((step: string, i: number) => {
             db.query(stepInsert, [recipeID, i, step], function (err, rows, fields) {
                 if (err) {
                     res.status(500).json(err);
