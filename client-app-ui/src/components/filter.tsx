@@ -7,6 +7,7 @@ export default function Filter(props: { name: string, options: Array<string>, on
     const { name, options, onChange } = props;
     return (
         <Autocomplete
+            freeSolo
             multiple
             id="tags-outlined"
             options={options}

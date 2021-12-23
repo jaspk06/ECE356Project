@@ -12,7 +12,8 @@ interface Filter {
     tags?: Array<string>,
     ingredients?: Array<string>,
     rating?: number,
-    cookTime?: number
+    cookTime?: number,
+    name?: string
 }
 
 export default function Recipes() {
@@ -72,11 +73,12 @@ export default function Recipes() {
             </header>
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                 <h2 className="text-2xl font-bold text-gray-900">Filters</h2>
-                <div className="my-4 grid grid-cols-4 gap-4">
+                <div className="my-4 grid grid-cols-6 gap-4">
                     <Filter name="Tags" options={tags} onChange={setTagFilters} />
                     <Filter name="Ingredients" options={ingredients} onChange={setIngredientFilters} />
                     <TextField type="number" value={filters?.rating} onChange={(e) => _setFilters({ ...filters, rating: parseInt(e.target.value) })} variant="filled" label={"Minimum Rating"} />
                     <TextField type="number" value={filters?.cookTime} onChange={(e) => _setFilters({ ...filters, cookTime: parseInt(e.target.value) })} variant="filled" label={"Maximum Cook Time"} />
+                    <TextField type="text" value={filters?.name} onChange={(e) => _setFilters({ ...filters, name: e.target.value })} variant="filled" label={"Recipe Name"} />
                     <button disabled={loading} onClick={() => fetchData(true)} className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
                         Search
                     </button>
