@@ -15,8 +15,8 @@ export interface RecipeMini {
     recipeID: number,
     name: string,
     cookTime: number,
-    firstName: string,
-    lastName: string,
+    firstName?: string,
+    lastName?: string,
     rating: number,
     description: string
 }
@@ -34,5 +34,7 @@ export interface Review {
     review: string,
     userID: number,
     firstName: string,
-    lastName: string
+    lastName: string,
+    recipeID?: number,
+    recipeName?: string
 }

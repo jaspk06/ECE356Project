@@ -3,44 +3,12 @@ import { db } from '../app';
 
 const IngredientController: Router = Router();
 
-IngredientController.get('/:userId', async (req: Request, res: Response, next: NextFunction) => {
+IngredientController.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { userId } = req.params;
+        const query = 'SELECT ingredientName FROM Ingredients';
 
-        // create the ingredient
-
-        var result;
-
-        var { ingredientID, ingredientName, aliasID } = req.body;
-
-        aliasID = parseInt(aliasID);
-
-        console.log(req.body);
-
-        var ingredientQuery = `SELECT * FROM Ingredients`;
-        ingredientQuery += ` WHERE ingredientName LIKE '%' `
-        // var values = [];
-
-        if(!(ingredientID === undefined)){
-            ingredientQuery+= ` AND ingredientID = `+ ingredientID + " ";
-        }
-        if(!(ingredientName === undefined)){
-            ingredientQuery+= ` AND ingredientName = "`+ ingredientName + `" `;
-        }
-        if(!(aliasID === undefined) && !(isNaN(aliasID))){
-            ingredientQuery+= ` AND aliasID = `+ aliasID + " ";
-        }
-
-        var returnRes;
-        db.query( ingredientQuery, function (err, rows, fields) {
-            if (err) {
-                console.log(err)
-            } else {
-                res.status(200).json(rows);
-            }
-        })
-        console.log(returnRes);
-        
+        const ingredients = JSON.parse(JSON.stringify(await db.promise().query(query)))[0].map((ingredient: { ingredientName: string }) => ingredient.ingredientName);
+        res.status(200).json(ingredients);
     } catch (err) {
         console.error(err);
         next(err);
@@ -67,14 +35,14 @@ IngredientController.post('/:userId', async (req: Request, res: Response, next: 
 
         var values = [ingredientName, aliasID];
 
-        db.query( ingredientInsert, values, function (err, rows, fields) {
+        db.query(ingredientInsert, values, function (err, rows, fields) {
             if (err) {
                 console.log(err)
             } else {
                 console.log(rows)
             }
         })
-        
+
         res.status(200).json("success");
     } catch (err) {
         console.error(err);

@@ -3,27 +3,15 @@ import { db } from '../app';
 
 const TagController: Router = Router();
 
-TagController.get('/:userId', async (req: Request, res: Response, next: NextFunction) => {
+TagController.get('/:tagId?', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { userId } = req.params;
+        const { tagId } = req.params;
 
-        // tag details
-        let { tagID } = req.body;
+        let userQuery = 'SELECT tag FROM Tags';
+        if (tagId) userQuery += 'WHERE tagID =' + tagId;
 
-        tagID = parseInt(tagID);
-
-        console.log(req.body);
-
-        const userQuery = `SELECT * FROM Tags WHERE tagID =` + tagID;
-
-        db.query( userQuery, function (err, rows, fields) {
-            if (err) {
-                console.log(err)
-            } else {
-                res.status(200).json(rows);
-            }
-        })
-        
+        const tags = JSON.parse(JSON.stringify(await db.promise().query(userQuery)))[0].map((tag: { tag: string }) => tag.tag);
+        res.status(200).json(tags);
     } catch (err) {
         console.error(err);
         next(err);
@@ -33,9 +21,8 @@ TagController.get('/:userId', async (req: Request, res: Response, next: NextFunc
 
 
 // creating a tag
-TagController.post('/:userId', async (req: Request, res: Response, next: NextFunction) => {
+TagController.post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { userId } = req.params;
         // create the tag
 
         let { tagID, tag } = req.body;
@@ -46,14 +33,14 @@ TagController.post('/:userId', async (req: Request, res: Response, next: NextFun
 
         const values = [tagID, tag];
 
-        db.query( userInsert, values, function (err, rows, fields) {
+        db.query(userInsert, values, function (err, rows, fields) {
             if (err) {
                 console.log(err)
             } else {
                 console.log(rows)
             }
         })
-        
+
         res.status(200).json("success");
     } catch (err) {
         console.error(err);

@@ -5,11 +5,9 @@ import { db } from '../app';
 
 const RecipeController: Router = Router();
 
-RecipeController.get('/', async (req: Request, res: Response, next: NextFunction) => {
+RecipeController.post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
         // query for recipes
-        let result;
-
         let { recipeID, name, authorID, cookTime, ingredients, steps, date, description, tags, rating, page } = req.body;
         console.log(req.body);
         
@@ -29,22 +27,22 @@ RecipeController.get('/', async (req: Request, res: Response, next: NextFunction
         if ((page === undefined) || (isNaN(page))) {
             page = 0;
         }
-        page = page * 25;
+        page = page * 16;
 
         let query = "with RecipeQuery as "
         let recipeQuery = `( SELECT * FROM Recipe `;
         recipeQuery += "WHERE recipeID LIKE '%'";
 
-        if(!(recipeID === undefined) && !(isNaN(recipeID)) ){
+        if(recipeID && !(isNaN(recipeID)) ){
             recipeQuery+= ` AND recipeID = `+ recipeID + " ";
         }
-        if(!(authorID === undefined) && !(isNaN(authorID)) ){
+        if(authorID && !(isNaN(authorID)) ){
             recipeQuery+= ` AND authorID = `+ authorID + ` `;
         }
-        if(!(name === undefined) ){
+        if(name ){
             recipeQuery+= ` AND name LIKE "%`+ name + `%"`;
         }
-        if(!(cookTime === undefined) ){
+        if(cookTime){
             recipeQuery+= ` AND cookTime <= `+ cookTime + ` `;
         }
 
@@ -59,8 +57,6 @@ RecipeController.get('/', async (req: Request, res: Response, next: NextFunction
 
             ingredientFlag = true;
 
-            let firstFlag = true;
-            
             let ingredientsQuery= "";
 
             for(const ingredient in ingredients){
@@ -94,8 +90,6 @@ RecipeController.get('/', async (req: Request, res: Response, next: NextFunction
 
 
             tagFlag = true;
-
-            let firstFlag = true;
             
             let tagQuery= "";
 
@@ -140,7 +134,7 @@ RecipeController.get('/', async (req: Request, res: Response, next: NextFunction
         query += "INNER JOIN Users on Users.userID = RecipeQuery.authorID";
         query+= " inner join Reviews using(recipeID) where Rating >=" +Math.min(5, rating)+ " order by Rating DESC"
 
-        query += ` LIMIT 25 OFFSET ${page}`
+        query += ` LIMIT 16 OFFSET ${page}`
 
                
         console.log(" query: " + query);

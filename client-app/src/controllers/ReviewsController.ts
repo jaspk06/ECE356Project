@@ -16,21 +16,21 @@ ReviewsController.get('/:recipeId', async (req: Request, res: Response, next: Ne
         let userQuery = `SELECT review FROM Reviews`;
         userQuery += ` WHERE userID LIKE '%' `
 
-        if(!(userID === undefined) && !(isNaN(userID)) ){
-            userQuery+= ` AND userID = `+ userID + " ";
+        if (!(userID === undefined) && !(isNaN(userID))) {
+            userQuery += ` AND userID = ` + userID + " ";
         }
-        if(!(reviewID === undefined) && !(isNaN(reviewID)) ){
-            userQuery+= ` AND reviewID = `+ reviewID + ` `;
+        if (!(reviewID === undefined) && !(isNaN(reviewID))) {
+            userQuery += ` AND reviewID = ` + reviewID + ` `;
         }
-        if(!(recipeID === undefined) && !(isNaN(recipeID)) ){
-            userQuery+= ` AND recipeID = `+ recipeID + ` `;
+        if (!(recipeID === undefined) && !(isNaN(recipeID))) {
+            userQuery += ` AND recipeID = ` + recipeID + ` `;
         }
-        if(!(rating === undefined) ){
-            userQuery+= ` AND rating > `+ rating + ` `;
+        if (!(rating === undefined)) {
+            userQuery += ` AND rating > ` + rating + ` `;
         }
 
         let returnRes;
-        db.query( userQuery, function (err, rows, fields) {
+        db.query(userQuery, function (err, rows, fields) {
             if (err) {
                 console.log(err)
             } else {
@@ -38,7 +38,22 @@ ReviewsController.get('/:recipeId', async (req: Request, res: Response, next: Ne
             }
         })
         console.log(returnRes);
-        
+
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+});
+
+ReviewsController.get('/user/:userID', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { userID } = req.params;
+
+        const query = `SELECT * FROM Reviews INNER JOIN Recipe ON Reviews.recipeID = Recipe.recipeID WHERE userID=${userID}`;
+
+        const reviews = JSON.parse(JSON.stringify(await db.promise().query(query)));
+
+        res.status(200).json(reviews);
     } catch (err) {
         console.error(err);
         next(err);
@@ -62,14 +77,14 @@ ReviewsController.post('/:userId', async (req: Request, res: Response, next: Nex
 
         var values = [reviewID, recipeID, userID, rating, review];
 
-        db.query( userInsert, values, function (err, rows, fields) {
+        db.query(userInsert, values, function (err, rows, fields) {
             if (err) {
                 console.log(err)
             } else {
                 console.log(rows)
             }
         })
-        
+
         res.status(200).json("success");
     } catch (err) {
         console.error(err);

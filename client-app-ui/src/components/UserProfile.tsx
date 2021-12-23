@@ -26,7 +26,7 @@ export default function UserProfile() {
             {user &&
                 <>
                     <Heading firstName={user.firstName} lastName={user.lastName} dateJoined={user.dateJoined} userID={user.userID} />
-                    <UserCard />
+                    <UserCard userID={user.userID}/>
                 </>}
         </>
     )

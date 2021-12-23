@@ -50,20 +50,6 @@ export default function Navigation(props: any) {
                                             </button>
                                         </Link>
                                     </div>
-                                    <div className="ml-10 flex items-baseline space-x-4">
-                                        <div className="flex rounded-md shadow-sm ">
-                                            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                                                <SearchIcon className="h-4 w-4" aria-hidden="true" />
-                                            </span>
-                                            <input
-                                                type="text"
-                                                name="search-box"
-                                                id="search-box"
-                                                className="focus:ring-indigo-500 focus:border-indigo-500 flex-1  block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
-                                                placeholder="Search for recipe"
-                                            />
-                                        </div>
-                                    </div>
                                 </div>
                                 {!signedIn &&
                                     <>
@@ -122,7 +108,7 @@ export default function Navigation(props: any) {
                                                 leaveTo="transform opacity-0 scale-95"
                                             >
                                                 <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                                    <Link to={`users/${userId}`}>
+                                                    <Link to={`/users/${userId}`}>
                                                         <Menu.Item>
                                                             {({ active }) => (
                                                                 <p

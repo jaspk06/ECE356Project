@@ -1,11 +1,51 @@
-export default function UserCard() {
+import axios from "axios";
+import { useEffect, useState } from "react"
+import { Recipe, RecipeMini, Review } from "../types/Recipe"
+import { baseURL } from "../utils";
+import RecipeCardMini from "./RecipeCardMini";
+import ReviewCardMini from "./ReviewCardMini";
+
+export default function UserCard(props: { userID: number }) {
+    const { userID } = props;
+    const [reviews, setReviews] = useState<Array<Review>>();
+    const [recipes, setRecipes] = useState<Array<RecipeMini>>();
+
+    useEffect(() => {
+        axios.post(`${baseURL}recipe`, { authorID: userID }).then(res =>
+            setRecipes(res.data)
+        )
+        axios.get(`${baseURL}reviews/user/${userID}`).then(res =>
+            setReviews(res.data[0].map((review: any) => ({ ...review, recipeName: review.name })))
+        )
+    }, [])
+
     return (
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-                <div className="px-4 py-5 sm:px-6">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">{"Activity"}</h3>
-                    <p className="mt-1 max-w-2xl text-sm text-gray-500">{"some activity"}</p>
-                </div>
+            <h1 className="mb-4 text-3xl font-bold text-gray-900">Recipes</h1>
+            <div className="grid grid-cols-4 gap-4">
+                {recipes && recipes.map(recipe =>
+                    <RecipeCardMini
+                        recipeID={recipe.recipeID}
+                        name={recipe.name}
+                        cookTime={recipe.cookTime}
+                        rating={recipe.rating}
+                        description={recipe.description}
+                    />)}
+            </div>
+
+            <h1 className="my-4 text-3xl font-bold text-gray-900">Reviews</h1>
+            <div className="grid grid-cols-4 gap-4">
+                {reviews && reviews.map(review =>
+                    <ReviewCardMini
+                        recipeID={review.recipeID}
+                        rating={review.rating}
+                        date={review.date}
+                        review={review.review}
+                        userID={review.userID}
+                        firstName={review.firstName}
+                        lastName={review.lastName}
+                        recipeName={review.recipeName}
+                    />)}
             </div>
         </div>
     )

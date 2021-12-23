@@ -9,7 +9,7 @@ export default function RecipeCardMini(props: RecipeMini) {
             <Link to={`/recipes/${recipeID}`}>
                 <div className="px-4 py-5 sm:px-6">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">{name}</h3>
-                    <p className="mt-1 max-w-2xl text-sm text-gray-500">{"Created by: " + firstName + " " + lastName}</p>
+                    {firstName && <p className="mt-1 max-w-2xl text-sm text-gray-500">{"Created by: " + firstName + " " + lastName}</p>}
                     <StarRating stars={rating} />
                     <p className="mt-1 max-w-2xl text-sm text-gray-500">{"Ready in: " + cookTime + " minutes"}</p>
                     <p className="mt-1 max-w-2xl text-sm text-gray-500">{description.length > 80 ? description.substring(0, 79) + "..." : description}</p>

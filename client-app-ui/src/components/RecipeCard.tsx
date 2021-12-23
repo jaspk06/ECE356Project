@@ -42,7 +42,7 @@ export default function RecipeCard() {
                             </span>
                         </div>
                         <h3 className="text-lg leading-6 font-medium text-gray-900">{recipe.recipeName}</h3>
-                        <Link to="/users/1231">
+                        <Link to={`/users/${recipe.authorID}`}>
                             <p className="mt-1 max-w-2xl text-sm text-gray-500">{"Created by: " + recipe.authorName}</p>
                         </Link>
                         <StarRating stars={recipe.rating} />
